@@ -5,12 +5,12 @@ import shutil
 from pathlib import Path
 
 import numpy as np
-import SimpleITK as sitk
 
 from common import (
     case_id_from_image,
     dataset_name,
     default_dataset_root,
+    discover_split_dirs,
     find_images,
     find_label_for_image,
     load_label_config,
@@ -32,17 +32,21 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--dataset-root", type=Path, default=default_dataset_root(),
                         help="Output root that will contain nnUNet_raw, nnUNet_preprocessed and nnUNet_result.")
     parser.add_argument("--label-config", type=Path, default=None)
+    parser.add_argument("--dry-run", action="store_true",
+                        help="Only report discovered cases and missing labels. Does not require SimpleITK.")
 
-    parser.add_argument("--ct-train-images", type=Path, default=None)
-    parser.add_argument("--ct-train-labels", type=Path, default=None)
-    parser.add_argument("--ct-val-images", type=Path, default=None)
-    parser.add_argument("--mr-train-images", type=Path, default=None)
-    parser.add_argument("--mr-train-labels", type=Path, default=None)
-    parser.add_argument("--mr-val-images", type=Path, default=None)
+    parser.add_argument("--ct-train-images", type=Path, nargs="*", default=None)
+    parser.add_argument("--ct-train-labels", type=Path, nargs="*", default=None)
+    parser.add_argument("--ct-val-images", type=Path, nargs="*", default=None)
+    parser.add_argument("--mr-train-images", type=Path, nargs="*", default=None)
+    parser.add_argument("--mr-train-labels", type=Path, nargs="*", default=None)
+    parser.add_argument("--mr-val-images", type=Path, nargs="*", default=None)
     return parser.parse_args()
 
 
 def remap_label_to_train_values(label_path: Path, output_path: Path, official_to_train: dict[int, int]) -> None:
+    import SimpleITK as sitk
+
     image = sitk.ReadImage(str(label_path))
     arr = sitk.GetArrayFromImage(image)
     unique = set(int(v) for v in np.unique(arr))
@@ -70,8 +74,8 @@ def remap_label_to_train_values(label_path: Path, output_path: Path, official_to
 
 def copy_training_cases(
     modality: str,
-    train_images_dir: Path | None,
-    train_labels_dir: Path | None,
+    train_images_dir: list[Path],
+    train_labels_dir: list[Path] | None,
     dataset_dir: Path,
     official_to_train: dict[int, int],
 ) -> list[dict]:
@@ -105,7 +109,7 @@ def copy_training_cases(
     return records
 
 
-def copy_validation_cases(modality: str, val_images_dir: Path | None, dataset_dir: Path) -> list[dict]:
+def copy_validation_cases(modality: str, val_images_dir: list[Path], dataset_dir: Path) -> list[dict]:
     images = find_images(val_images_dir)
     records = []
     images_ts = dataset_dir / "imagesTs"
@@ -125,10 +129,20 @@ def copy_validation_cases(modality: str, val_images_dir: Path | None, dataset_di
     return records
 
 
-def inferred_dir(root: Path | None, name: str) -> Path | None:
-    if root is None:
-        return None
-    return root / name
+def dry_run_modality(modality: str, train_images_dir: list[Path], train_labels_dir: list[Path] | None,
+                     val_images_dir: list[Path]) -> None:
+    train_images = find_images(train_images_dir)
+    val_images = find_images(val_images_dir)
+    missing_labels = [
+        image_path for image_path in train_images
+        if find_label_for_image(image_path, train_labels_dir) is None
+    ]
+    print(f"[{modality.upper()}] dry run")
+    print(f"[{modality.upper()}] training images: {len(train_images)}")
+    print(f"[{modality.upper()}] validation images: {len(val_images)}")
+    print(f"[{modality.upper()}] missing labels: {len(missing_labels)}")
+    for path in missing_labels[:10]:
+        print(f"  missing label for {path}")
 
 
 def convert_modality(modality: str, args: argparse.Namespace, cfg: dict) -> None:
@@ -137,13 +151,20 @@ def convert_modality(modality: str, args: argparse.Namespace, cfg: dict) -> None
     dataset_dir.mkdir(parents=True, exist_ok=True)
 
     if modality == "ct":
-        train_images = args.ct_train_images or inferred_dir(args.train_root, "ct_train")
+        train_images = args.ct_train_images or discover_split_dirs(args.train_root, "ct", "train")
         train_labels = args.ct_train_labels
-        val_images = args.ct_val_images or inferred_dir(args.val_root, "ct_val")
+        val_images = args.ct_val_images or discover_split_dirs(args.val_root, "ct", "val")
     else:
-        train_images = args.mr_train_images or inferred_dir(args.train_root, "mr_train")
+        train_images = args.mr_train_images or discover_split_dirs(args.train_root, "mr", "train")
         train_labels = args.mr_train_labels
-        val_images = args.mr_val_images or inferred_dir(args.val_root, "mr_val")
+        val_images = args.mr_val_images or discover_split_dirs(args.val_root, "mr", "val")
+
+    print(f"[{modality.upper()}] train image dirs: {[str(p) for p in train_images]}")
+    print(f"[{modality.upper()}] val image dirs: {[str(p) for p in val_images]}")
+
+    if args.dry_run:
+        dry_run_modality(modality, train_images, train_labels, val_images)
+        return
 
     official_to_train, _ = mapping_arrays(cfg)
 

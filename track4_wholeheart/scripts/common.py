@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
-from typing import Dict, Iterable, List, Tuple
+from typing import Dict, Iterable, List, Sequence, Tuple
 
 
 TRACK4_ROOT = Path(__file__).resolve().parents[1]
@@ -66,19 +66,49 @@ def sanitize_case_id(value: str) -> str:
     return re.sub(r"[^A-Za-z0-9_]", "_", value)
 
 
-def find_images(directory: Path | None) -> List[Path]:
-    if directory is None or not directory.exists():
+def normalize_dirs(directories: Path | Sequence[Path] | None) -> List[Path]:
+    if directories is None:
         return []
-    images = sorted(directory.rglob("*_image.nii.gz"))
+    if isinstance(directories, Path):
+        directories = [directories]
+    return [Path(d) for d in directories if d is not None and Path(d).exists()]
+
+
+def discover_split_dirs(root: Path | None, modality: str, split: str) -> List[Path]:
+    if root is None or not root.exists():
+        return []
+    key = modality_key(modality)
+    split_key = split.lower()
+
+    exact = root / f"{key}_{split_key}"
+    if exact.exists():
+        return [exact]
+
+    matches = []
+    for child in sorted(root.iterdir()):
+        if not child.is_dir():
+            continue
+        name = child.name.lower()
+        if key in name and split_key in name:
+            matches.append(child)
+    return matches
+
+
+def find_images(directories: Path | Sequence[Path] | None) -> List[Path]:
+    roots = normalize_dirs(directories)
+    if not roots:
+        return []
+
+    images = sorted(p for root in roots for p in root.rglob("*_image.nii.gz"))
     if images:
         return images
     return sorted(
-        p for p in directory.rglob("*.nii.gz")
+        p for root in roots for p in root.rglob("*.nii.gz")
         if "_label.nii.gz" not in p.name and "_seg.nii.gz" not in p.name
     )
 
 
-def label_candidates(image_path: Path, labels_dir: Path | None = None) -> Iterable[Path]:
+def label_candidates(image_path: Path, labels_dir: Path | Sequence[Path] | None = None) -> Iterable[Path]:
     image_name = image_path.name
     if image_name.endswith("_image.nii.gz"):
         label_name = image_name.replace("_image.nii.gz", "_label.nii.gz")
@@ -87,16 +117,12 @@ def label_candidates(image_path: Path, labels_dir: Path | None = None) -> Iterab
 
     yield image_path.with_name(label_name)
 
-    if labels_dir is not None:
-        try:
-            rel = image_path.relative_to(image_path.parents[0])
-        except ValueError:
-            rel = Path(label_name)
-        yield labels_dir / rel.parent / label_name
-        yield labels_dir / label_name
+    for root in normalize_dirs(labels_dir):
+        yield root / label_name
+        yield root / image_path.parent.name / label_name
 
 
-def find_label_for_image(image_path: Path, labels_dir: Path | None = None) -> Path | None:
+def find_label_for_image(image_path: Path, labels_dir: Path | Sequence[Path] | None = None) -> Path | None:
     for candidate in label_candidates(image_path, labels_dir):
         if candidate.exists():
             return candidate

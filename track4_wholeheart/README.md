@@ -58,18 +58,36 @@ When the official training set is available, place or point it like this if poss
 
 ```text
 Wholeheart_Train_Dataset/
-  ct_train/
-    CaseCT001_image.nii.gz
-    CaseCT001_label.nii.gz
-  mr_train/
-    CaseMR001_image.nii.gz
-    CaseMR001_label.nii.gz
+  A ct_train/
+    Case1001_image.nii.gz
+    Case1001_label.nii.gz
+  B ct_train/
+    ...
+  G ct_train/
+    ...
+  C and D mr_train/
+    Case3001_image.nii.gz
+    Case3001_label.nii.gz
+  E mr_train/
+    ...
 
 Wholeheart_Val_Dataset/
   ct_val/
     CaseCTVal001_image.nii.gz
   mr_val/
     CaseMRVal001_image.nii.gz
+```
+
+The converter automatically discovers all child folders whose names contain `ct`/`mr` and `train`/`val`, so the official multi-center folder names above are supported directly.
+
+Before conversion, you can verify discovery and label pairing without requiring SimpleITK:
+
+```bash
+python track4_wholeheart/scripts/convert_to_nnunet.py \
+  --train-root /path/to/Wholeheart_Train_Dataset \
+  --val-root /path/to/Wholeheart_Val_Dataset \
+  --task both \
+  --dry-run
 ```
 
 Then run:
@@ -82,6 +100,8 @@ python track4_wholeheart/scripts/convert_to_nnunet.py \
 ```
 
 If the official training labels are in separate folders, use explicit arguments such as `--ct-train-images`, `--ct-train-labels`, `--mr-train-images`, and `--mr-train-labels`.
+
+Observed local training labels use official label values. One MR case, `Case3010_label.nii.gz`, contains value `421`; this scaffold maps `421` to the LA training class together with official LA value `420`.
 
 ## Plan and Preprocess
 
