@@ -13,3 +13,15 @@ From Windows PowerShell:
 ```
 
 Then upload the generated `test_nnunetv2_tta_server.tar.gz` to the server and follow `SERVER_SETUP.md`.
+
+## Conda-only server
+
+If Docker is unavailable on the server, upload the same server package and follow `CONDA_SETUP.md`:
+
+```bash
+tar -xzf test_nnunetv2_tta_server.tar.gz
+cd test_nnunetv2_tta
+bash setup_conda_env.sh
+conda activate nnunet_tta
+INPUT_DIR=/path/to/input OUTPUT_DIR=/path/to/output ./run_infer_conda.sh
+```

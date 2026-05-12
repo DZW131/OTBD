@@ -391,10 +391,16 @@ class nnUNetPredictor(object):
                 ofile = preprocessed['ofile']
                 if ofile is not None:
                     print(f'\nPredicting {os.path.basename(ofile)}:')
-                    json_file = "/workspace/DATASET/nnUNet_raw/Dataset078_LIVER/Test_name_pred_mapping.json"
+                    project_root = os.environ.get('PROJECT_ROOT', '/workspace')
+                    output_root = os.environ.get('OUTPUT_DIR', '/output')
+                    json_file = os.environ.get(
+                        'TEST_NAME_PRED_MAPPING',
+                        join(project_root, "DATASET/nnUNet_raw/Dataset078_LIVER/Test_name_pred_mapping.json")
+                    )
                     val = self.get_val_from_key(json_file, os.path.basename(ofile))
-                    with open('/output/log_infer.txt', 'a') as f:
-                    # with open('/home/jincan/long_seg/test_docker/nnunet_style_val_pred_test/log_infer.txt', 'a') as f:
+                    maybe_mkdir_p(output_root)
+                    log_infer_file = os.environ.get('LOG_INFER_FILE', join(output_root, 'log_infer.txt'))
+                    with open(log_infer_file, 'a') as f:
                         print('saving message_infer to log_infer.txt')
                         f.write(f'Predicting {val}' + '\n')
                     if "C" in val:
@@ -1110,5 +1116,3 @@ if __name__ == '__main__':
         [['/media/isensee/raw_data/nnUNet_raw/Dataset004_Hippocampus/imagesTs/hippocampus_002_0000.nii.gz'], ['/media/isensee/raw_data/nnUNet_raw/Dataset004_Hippocampus/imagesTs/hippocampus_005_0000.nii.gz']],
         '/home/isensee/temp/tmp', False, True, None
     )
-
-

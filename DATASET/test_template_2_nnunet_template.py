@@ -5,9 +5,16 @@ import json
 import shutil
 
 # 输入输出路径
-input_root = '/input'  # 修改为你的路径
-output_dir = '/workspace/DATASET/nnUNet_raw/Dataset078_LIVER/imagesTs'        # 修改为保存路径
-mapping_file = '/workspace/DATASET/nnUNet_raw/Dataset078_LIVER/Test_name_pred_mapping.json'  # 保存映射字典的文件
+project_root = os.environ.get('PROJECT_ROOT', '/workspace')
+input_root = os.environ.get('INPUT_DIR', '/input')  # 修改为你的路径
+output_dir = os.environ.get(
+    'NNUNET_IMAGES_TS',
+    os.path.join(project_root, 'DATASET/nnUNet_raw/Dataset078_LIVER/imagesTs')
+)        # 修改为保存路径
+mapping_file = os.environ.get(
+    'TEST_NAME_PRED_MAPPING',
+    os.path.join(project_root, 'DATASET/nnUNet_raw/Dataset078_LIVER/Test_name_pred_mapping.json')
+)  # 保存映射字典的文件
 
 # 创建输出目录（如不存在）
 os.makedirs(output_dir, exist_ok=True)
@@ -32,5 +39,4 @@ for GED4_path in GED4_list:
     
 with open(mapping_file, 'w') as f:
     json.dump(name_map, f, indent=4)
-
 
