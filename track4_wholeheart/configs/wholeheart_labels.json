@@ -1,0 +1,56 @@
+{
+  "task_name": "CARE2026_WholeHeart",
+  "source": "https://zmic.org.cn/care_2026/track_wholeheart/",
+  "dataset_ids": {
+    "ct": 401,
+    "mr": 402
+  },
+  "dataset_names": {
+    "ct": "Dataset401_CARE2026_WholeHeart_CT",
+    "mr": "Dataset402_CARE2026_WholeHeart_MR"
+  },
+  "channel_names": {
+    "ct": "CT",
+    "mr": "MR"
+  },
+  "labels": {
+    "background": 0,
+    "LV": 1,
+    "RV": 2,
+    "LA": 3,
+    "RA": 4,
+    "Myo": 5,
+    "AO": 6,
+    "PA": 7
+  },
+  "official_label_values": {
+    "background": 0,
+    "LV": 500,
+    "RV": 600,
+    "LA": 420,
+    "RA": 550,
+    "Myo": 205,
+    "AO": 820,
+    "PA": 850
+  },
+  "train_to_official": {
+    "0": 0,
+    "1": 500,
+    "2": 600,
+    "3": 420,
+    "4": 550,
+    "5": 205,
+    "6": 820,
+    "7": 850
+  },
+  "official_to_train": {
+    "0": 0,
+    "500": 1,
+    "600": 2,
+    "420": 3,
+    "550": 4,
+    "205": 5,
+    "820": 6,
+    "850": 7
+  }
+}

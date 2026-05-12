@@ -4,6 +4,10 @@ This repository contains the CARE liver nnU-Netv2 TTA inference package and depl
 
 Large model checkpoint files (`checkpoint_*.pth`) are intentionally not tracked by Git because each file is larger than GitHub's regular file size limit. Use the server package workflow in `SERVER_SETUP.md` when a runnable bundle with checkpoints is needed.
 
+## CARE 2026 Track4
+
+The `track4_wholeheart` branch contains the new CARE-Whole Heart baseline scaffold under `track4_wholeheart/`. It adapts the old nnU-Net competition workflow to CT/MR seven-class whole-heart segmentation while keeping the old liver package available for reference.
+
 ## Server package
 
 From Windows PowerShell:

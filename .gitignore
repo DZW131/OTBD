@@ -21,3 +21,8 @@
 # Editor metadata
 .idea/
 .vscode/
+
+# Track4 generated data and model outputs
+track4_wholeheart/DATASET/
+track4_wholeheart/outputs/
+track4_wholeheart/reports/*.json
