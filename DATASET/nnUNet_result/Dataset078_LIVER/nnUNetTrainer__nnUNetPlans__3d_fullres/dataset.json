@@ -1,0 +1,11 @@
+{
+    "channel_names": {
+        "0": "GED4"
+    },
+    "labels": {
+        "background": 0,
+        "Liver": 1
+    },
+    "numTraining": 90,
+    "file_ending": ".nii.gz"
+}

@@ -1,0 +1,1466 @@
+{
+    "foreground_mean": {
+        "Dice": 0.9824026606709569,
+        "FN": 14301.388888888889,
+        "FP": 9868.211111111112,
+        "IoU": 0.9661245058642847,
+        "TN": 15247094.755555555,
+        "TP": 681456.9666666667,
+        "n_pred": 691325.1777777778,
+        "n_ref": 695758.3555555556
+    },
+    "mean": {
+        "1": {
+            "Dice": 0.9824026606709569,
+            "FN": 14301.388888888889,
+            "FP": 9868.211111111112,
+            "IoU": 0.9661245058642847,
+            "TN": 15247094.755555555,
+            "TP": 681456.9666666667,
+            "n_pred": 691325.1777777778,
+            "n_ref": 695758.3555555556
+        }
+    },
+    "metric_per_case": [
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9201373343481375,
+                    "FN": 147638,
+                    "FP": 23608,
+                    "IoU": 0.8520873659361987,
+                    "TN": 28202377,
+                    "TP": 986505,
+                    "n_pred": 1010113,
+                    "n_ref": 1134143
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0001.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0001.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9722182482653678,
+                    "FN": 9708,
+                    "FP": 24470,
+                    "IoU": 0.9459384218726521,
+                    "TN": 18684531,
+                    "TP": 598027,
+                    "n_pred": 622497,
+                    "n_ref": 607735
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0002.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0002.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9765130845478686,
+                    "FN": 5451,
+                    "FP": 23516,
+                    "IoU": 0.9541041217087647,
+                    "TN": 18685590,
+                    "TP": 602179,
+                    "n_pred": 625695,
+                    "n_ref": 607630
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0003.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0003.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9836122544740058,
+                    "FN": 14899,
+                    "FP": 8396,
+                    "IoU": 0.9677529651491157,
+                    "TN": 18594344,
+                    "TP": 699097,
+                    "n_pred": 707493,
+                    "n_ref": 713996
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0004.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0004.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9751528747097423,
+                    "FN": 22792,
+                    "FP": 54155,
+                    "IoU": 0.951510572304683,
+                    "TN": 27773246,
+                    "TP": 1509935,
+                    "n_pred": 1564090,
+                    "n_ref": 1532727
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0005.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0005.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9742552179406326,
+                    "FN": 49448,
+                    "FP": 10357,
+                    "IoU": 0.9498027530636226,
+                    "TN": 28168728,
+                    "TP": 1131595,
+                    "n_pred": 1141952,
+                    "n_ref": 1181043
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0006.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0006.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9763937781903436,
+                    "FN": 29427,
+                    "FP": 20162,
+                    "IoU": 0.9538763612282026,
+                    "TN": 32479300,
+                    "TP": 1025543,
+                    "n_pred": 1045705,
+                    "n_ref": 1054970
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0007.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0007.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9630443875913189,
+                    "FN": 3247,
+                    "FP": 4351,
+                    "IoU": 0.9287228653445656,
+                    "TN": 4022170,
+                    "TP": 99000,
+                    "n_pred": 103351,
+                    "n_ref": 102247
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0008.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0008.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9680075582732338,
+                    "FN": 7727,
+                    "FP": 3820,
+                    "IoU": 0.9379986898484735,
+                    "TN": 3942530,
+                    "TP": 174691,
+                    "n_pred": 178511,
+                    "n_ref": 182418
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0009.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0009.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9797272445203354,
+                    "FN": 21168,
+                    "FP": 18296,
+                    "IoU": 0.9602601257932568,
+                    "TN": 18323678,
+                    "TP": 953594,
+                    "n_pred": 971890,
+                    "n_ref": 974762
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0010.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0010.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9576906745450304,
+                    "FN": 15828,
+                    "FP": 12470,
+                    "IoU": 0.9188161816809968,
+                    "TN": 14051433,
+                    "TP": 320269,
+                    "n_pred": 332739,
+                    "n_ref": 336097
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0011.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0011.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9743230610161765,
+                    "FN": 14313,
+                    "FP": 9006,
+                    "IoU": 0.9499317221477893,
+                    "TN": 13934256,
+                    "TP": 442425,
+                    "n_pred": 451431,
+                    "n_ref": 456738
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0012.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0012.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9835393762598663,
+                    "FN": 12068,
+                    "FP": 13189,
+                    "IoU": 0.9676118811576473,
+                    "TN": 13620177,
+                    "TP": 754566,
+                    "n_pred": 767755,
+                    "n_ref": 766634
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0013.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0013.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9758590016272994,
+                    "FN": 8615,
+                    "FP": 12065,
+                    "IoU": 0.952856103971896,
+                    "TN": 13961343,
+                    "TP": 417977,
+                    "n_pred": 430042,
+                    "n_ref": 426592
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0014.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0014.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9765003427574316,
+                    "FN": 22403,
+                    "FP": 13797,
+                    "IoU": 0.9540797946022194,
+                    "TN": 14251676,
+                    "TP": 752124,
+                    "n_pred": 765921,
+                    "n_ref": 774527
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0015.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0015.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9749035878959724,
+                    "FN": 4963,
+                    "FP": 10473,
+                    "IoU": 0.9510359965995457,
+                    "TN": 7149708,
+                    "TP": 299816,
+                    "n_pred": 310289,
+                    "n_ref": 304779
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0016.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0016.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9785288210236206,
+                    "FN": 13620,
+                    "FP": 13351,
+                    "IoU": 0.9579602843070016,
+                    "TN": 13758440,
+                    "TP": 614589,
+                    "n_pred": 627940,
+                    "n_ref": 628209
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0017.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0017.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9783850101543778,
+                    "FN": 13648,
+                    "FP": 7053,
+                    "IoU": 0.9576846658272146,
+                    "TN": 12310792,
+                    "TP": 468507,
+                    "n_pred": 475560,
+                    "n_ref": 482155
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0018.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0018.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9793585924296996,
+                    "FN": 12621,
+                    "FP": 6274,
+                    "IoU": 0.9595520867227236,
+                    "TN": 12332856,
+                    "TP": 448249,
+                    "n_pred": 454523,
+                    "n_ref": 460870
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0019.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0019.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9603462454169704,
+                    "FN": 33639,
+                    "FP": 10531,
+                    "IoU": 0.9237173830071275,
+                    "TN": 13820969,
+                    "TP": 534861,
+                    "n_pred": 545392,
+                    "n_ref": 568500
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0020.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0020.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9387854102200264,
+                    "FN": 51016,
+                    "FP": 6274,
+                    "IoU": 0.884632966094698,
+                    "TN": 8940595,
+                    "TP": 439299,
+                    "n_pred": 445573,
+                    "n_ref": 490315
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0021.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0021.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.8778095367622631,
+                    "FN": 194054,
+                    "FP": 25164,
+                    "IoU": 0.7822286550445391,
+                    "TN": 8430541,
+                    "TP": 787425,
+                    "n_pred": 812589,
+                    "n_ref": 981479
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0022.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0022.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9680467340008393,
+                    "FN": 38815,
+                    "FP": 10829,
+                    "IoU": 0.9380722615026121,
+                    "TN": 8635540,
+                    "TP": 752000,
+                    "n_pred": 762829,
+                    "n_ref": 790815
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0023.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0023.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9622299770074243,
+                    "FN": 31532,
+                    "FP": 33322,
+                    "IoU": 0.9272092618677501,
+                    "TN": 8546219,
+                    "TP": 826111,
+                    "n_pred": 859433,
+                    "n_ref": 857643
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0024.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0024.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9654198739956392,
+                    "FN": 25182,
+                    "FP": 32230,
+                    "IoU": 0.9331513816374721,
+                    "TN": 8578348,
+                    "TP": 801424,
+                    "n_pred": 833654,
+                    "n_ref": 826606
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0025.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0025.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9735876281334802,
+                    "FN": 12745,
+                    "FP": 25915,
+                    "IoU": 0.9485345800762529,
+                    "TN": 8686000,
+                    "TP": 712524,
+                    "n_pred": 738439,
+                    "n_ref": 725269
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0026.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0026.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9715319914570206,
+                    "FN": 11230,
+                    "FP": 26332,
+                    "IoU": 0.9446399726457029,
+                    "TN": 8758680,
+                    "TP": 640942,
+                    "n_pred": 667274,
+                    "n_ref": 652172
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0027.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0027.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9719160264553143,
+                    "FN": 9114,
+                    "FP": 25994,
+                    "IoU": 0.945366381993377,
+                    "TN": 8794576,
+                    "TP": 607500,
+                    "n_pred": 633494,
+                    "n_ref": 616614
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0028.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0028.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9771981090717594,
+                    "FN": 14114,
+                    "FP": 19486,
+                    "IoU": 0.9554128885945904,
+                    "TN": 8683603,
+                    "TP": 719981,
+                    "n_pred": 739467,
+                    "n_ref": 734095
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0029.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0029.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9647431609337042,
+                    "FN": 23563,
+                    "FP": 16493,
+                    "IoU": 0.9318877446912707,
+                    "TN": 8849096,
+                    "TP": 548032,
+                    "n_pred": 564525,
+                    "n_ref": 571595
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_0030.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_0030.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9937214113150766,
+                    "FN": 3987,
+                    "FP": 1546,
+                    "IoU": 0.9875211720580707,
+                    "TN": 5547009,
+                    "TP": 437858,
+                    "n_pred": 439404,
+                    "n_ref": 441845
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1001.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1001.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9909150083172459,
+                    "FN": 1028,
+                    "FP": 2238,
+                    "IoU": 0.9819936045870548,
+                    "TN": 4221820,
+                    "TP": 178114,
+                    "n_pred": 180352,
+                    "n_ref": 179142
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1002.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1002.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.8987457323863948,
+                    "FN": 25798,
+                    "FP": 7478,
+                    "IoU": 0.8161110097979077,
+                    "TN": 3915043,
+                    "TP": 147681,
+                    "n_pred": 155159,
+                    "n_ref": 173479
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1003.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1003.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.990047446287334,
+                    "FN": 1503,
+                    "FP": 2686,
+                    "IoU": 0.9802910469881388,
+                    "TN": 3678657,
+                    "TP": 208354,
+                    "n_pred": 211040,
+                    "n_ref": 209857
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1004.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1004.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9913471077945046,
+                    "FN": 1629,
+                    "FP": 3386,
+                    "IoU": 0.9828426760635659,
+                    "TN": 4315705,
+                    "TP": 287280,
+                    "n_pred": 290666,
+                    "n_ref": 288909
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1005.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1005.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9867259621870603,
+                    "FN": 1835,
+                    "FP": 3675,
+                    "IoU": 0.9737997080403038,
+                    "TN": 5780097,
+                    "TP": 204793,
+                    "n_pred": 208468,
+                    "n_ref": 206628
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1006.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1006.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.992174213457549,
+                    "FN": 4274,
+                    "FP": 9793,
+                    "IoU": 0.9844699616799865,
+                    "TN": 20393407,
+                    "TP": 891726,
+                    "n_pred": 901519,
+                    "n_ref": 896000
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1007.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1007.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9947149135960208,
+                    "FN": 6920,
+                    "FP": 4447,
+                    "IoU": 0.989485397773313,
+                    "TN": 20218132,
+                    "TP": 1069701,
+                    "n_pred": 1074148,
+                    "n_ref": 1076621
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1008.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1008.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9939647843995547,
+                    "FN": 1047,
+                    "FP": 2808,
+                    "IoU": 0.9880019794399679,
+                    "TN": 5669097,
+                    "TP": 317448,
+                    "n_pred": 320256,
+                    "n_ref": 318495
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1009.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1009.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9929000161946168,
+                    "FN": 5543,
+                    "FP": 4146,
+                    "IoU": 0.9859001411586652,
+                    "TN": 14877630,
+                    "TP": 677481,
+                    "n_pred": 681627,
+                    "n_ref": 683024
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1010.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1010.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9956574855219487,
+                    "FN": 1420,
+                    "FP": 990,
+                    "IoU": 0.9913525228386689,
+                    "TN": 5711706,
+                    "TP": 276284,
+                    "n_pred": 277274,
+                    "n_ref": 277704
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1011.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1011.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9950507037990011,
+                    "FN": 630,
+                    "FP": 1986,
+                    "IoU": 0.9901501573866289,
+                    "TN": 5059212,
+                    "TP": 262972,
+                    "n_pred": 264958,
+                    "n_ref": 263602
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1012.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1012.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9947039144158618,
+                    "FN": 1804,
+                    "FP": 998,
+                    "IoU": 0.9894636303471512,
+                    "TN": 5724464,
+                    "TP": 263134,
+                    "n_pred": 264132,
+                    "n_ref": 264938
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1013.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1013.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9930524060743963,
+                    "FN": 7038,
+                    "FP": 3716,
+                    "IoU": 0.9862006841914812,
+                    "TN": 20519886,
+                    "TP": 768560,
+                    "n_pred": 772276,
+                    "n_ref": 775598
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1014.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1014.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9937794837038578,
+                    "FN": 2353,
+                    "FP": 1355,
+                    "IoU": 0.9876358786262087,
+                    "TN": 3108244,
+                    "TP": 296192,
+                    "n_pred": 297547,
+                    "n_ref": 298545
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1015.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1015.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9947158954687125,
+                    "FN": 1482,
+                    "FP": 1273,
+                    "IoU": 0.9894873409268693,
+                    "TN": 5728335,
+                    "TP": 259310,
+                    "n_pred": 260583,
+                    "n_ref": 260792
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1016.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1016.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9946139600893058,
+                    "FN": 1247,
+                    "FP": 1865,
+                    "IoU": 0.9892856282126762,
+                    "TN": 3291704,
+                    "TP": 287339,
+                    "n_pred": 289204,
+                    "n_ref": 288586
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1017.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1017.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9924369533383924,
+                    "FN": 2377,
+                    "FP": 4141,
+                    "IoU": 0.9849874473132644,
+                    "TN": 3766950,
+                    "TP": 427652,
+                    "n_pred": 431793,
+                    "n_ref": 430029
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1018.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1018.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9951879093467519,
+                    "FN": 7262,
+                    "FP": 2127,
+                    "IoU": 0.9904219093340733,
+                    "TN": 20318942,
+                    "TP": 970869,
+                    "n_pred": 972996,
+                    "n_ref": 978131
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1019.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1019.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9929137231044287,
+                    "FN": 1868,
+                    "FP": 2698,
+                    "IoU": 0.9859271701776826,
+                    "TN": 3178165,
+                    "TP": 319889,
+                    "n_pred": 322587,
+                    "n_ref": 321757
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1020.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1020.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9854298464130181,
+                    "FN": 33473,
+                    "FP": 11242,
+                    "IoU": 0.9712781742386773,
+                    "TN": 31997602,
+                    "TP": 1512115,
+                    "n_pred": 1523357,
+                    "n_ref": 1545588
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1021.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1021.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9779015045388842,
+                    "FN": 85984,
+                    "FP": 9170,
+                    "IoU": 0.9567585794143135,
+                    "TN": 27159599,
+                    "TP": 2105375,
+                    "n_pred": 2114545,
+                    "n_ref": 2191359
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1022.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1022.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9945695163883231,
+                    "FN": 7108,
+                    "FP": 5421,
+                    "IoU": 0.9891976945195263,
+                    "TN": 32394587,
+                    "TP": 1147316,
+                    "n_pred": 1152737,
+                    "n_ref": 1154424
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1023.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1023.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.985252087867448,
+                    "FN": 34475,
+                    "FP": 12431,
+                    "IoU": 0.9709328554289737,
+                    "TN": 31940720,
+                    "TP": 1566806,
+                    "n_pred": 1579237,
+                    "n_ref": 1601281
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1024.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1024.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.994654342347764,
+                    "FN": 5280,
+                    "FP": 8364,
+                    "IoU": 0.9893655329158736,
+                    "TN": 36465738,
+                    "TP": 1269354,
+                    "n_pred": 1277718,
+                    "n_ref": 1274634
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1025.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1025.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9917091197020254,
+                    "FN": 16171,
+                    "FP": 2509,
+                    "IoU": 0.9835545863599908,
+                    "TN": 32418553,
+                    "TP": 1117199,
+                    "n_pred": 1119708,
+                    "n_ref": 1133370
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1026.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1026.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9913990043010845,
+                    "FN": 3266,
+                    "FP": 18725,
+                    "IoU": 0.9829447011541856,
+                    "TN": 32265038,
+                    "TP": 1267403,
+                    "n_pred": 1286128,
+                    "n_ref": 1270669
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1027.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1027.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.995119253995274,
+                    "FN": 6943,
+                    "FP": 7092,
+                    "IoU": 0.9902859199479517,
+                    "TN": 32109622,
+                    "TP": 1430775,
+                    "n_pred": 1437867,
+                    "n_ref": 1437718
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1028.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1028.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.989845186343408,
+                    "FN": 5205,
+                    "FP": 23163,
+                    "IoU": 0.979894539887736,
+                    "TN": 27949168,
+                    "TP": 1382592,
+                    "n_pred": 1405755,
+                    "n_ref": 1387797
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1029.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1029.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9920053364786383,
+                    "FN": 10657,
+                    "FP": 12402,
+                    "IoU": 0.9841374884001214,
+                    "TN": 32100753,
+                    "TP": 1430620,
+                    "n_pred": 1443022,
+                    "n_ref": 1441277
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1030.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1030.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9952928619620479,
+                    "FN": 3737,
+                    "FP": 6477,
+                    "IoU": 0.9906298306048777,
+                    "TN": 32464377,
+                    "TP": 1079841,
+                    "n_pred": 1086318,
+                    "n_ref": 1083578
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1031.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1031.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9949391353660768,
+                    "FN": 8700,
+                    "FP": 1063,
+                    "IoU": 0.9899292374979369,
+                    "TN": 18347296,
+                    "TP": 959677,
+                    "n_pred": 960740,
+                    "n_ref": 968377
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1032.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1032.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9952775838597336,
+                    "FN": 3090,
+                    "FP": 6394,
+                    "IoU": 0.9905995605066563,
+                    "TN": 16685831,
+                    "TP": 999405,
+                    "n_pred": 1005799,
+                    "n_ref": 1002495
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1033.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1033.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9954378098335039,
+                    "FN": 3402,
+                    "FP": 4703,
+                    "IoU": 0.9909170577767019,
+                    "TN": 18424404,
+                    "TP": 884227,
+                    "n_pred": 888930,
+                    "n_ref": 887629
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1034.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1034.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9940467878188517,
+                    "FN": 6249,
+                    "FP": 9908,
+                    "IoU": 0.988164037633042,
+                    "TN": 36383659,
+                    "TP": 1348920,
+                    "n_pred": 1358828,
+                    "n_ref": 1355169
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1035.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1035.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.99373866697782,
+                    "FN": 8311,
+                    "FP": 18305,
+                    "IoU": 0.9875552546506484,
+                    "TN": 31415698,
+                    "TP": 2112118,
+                    "n_pred": 2130423,
+                    "n_ref": 2120429
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1036.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1036.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.994863624813346,
+                    "FN": 853,
+                    "FP": 946,
+                    "IoU": 0.989779744692455,
+                    "TN": 3952745,
+                    "TP": 174224,
+                    "n_pred": 175170,
+                    "n_ref": 175077
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1037.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1037.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9938000830060978,
+                    "FN": 786,
+                    "FP": 1156,
+                    "IoU": 0.9876765702537027,
+                    "TN": 3971182,
+                    "TP": 155644,
+                    "n_pred": 156800,
+                    "n_ref": 156430
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1038.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1038.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9934279048199411,
+                    "FN": 850,
+                    "FP": 1857,
+                    "IoU": 0.9869416304872166,
+                    "TN": 3921468,
+                    "TP": 204593,
+                    "n_pred": 206450,
+                    "n_ref": 205443
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1039.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1039.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9910333912993667,
+                    "FN": 5991,
+                    "FP": 17176,
+                    "IoU": 0.9822261537234009,
+                    "TN": 32251000,
+                    "TP": 1280265,
+                    "n_pred": 1297441,
+                    "n_ref": 1286256
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1040.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1040.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9947988481123428,
+                    "FN": 2019,
+                    "FP": 1987,
+                    "IoU": 0.9896515202397251,
+                    "TN": 14012890,
+                    "TP": 383104,
+                    "n_pred": 385091,
+                    "n_ref": 385123
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1041.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1041.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9864500673753556,
+                    "FN": 2146,
+                    "FP": 11248,
+                    "IoU": 0.97326242706256,
+                    "TN": 13899057,
+                    "TP": 487549,
+                    "n_pred": 498797,
+                    "n_ref": 489695
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1042.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1042.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9932326702659007,
+                    "FN": 3409,
+                    "FP": 3623,
+                    "IoU": 0.9865563183583108,
+                    "TN": 13876929,
+                    "TP": 516039,
+                    "n_pred": 519662,
+                    "n_ref": 519448
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1043.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1043.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9964333507032568,
+                    "FN": 1646,
+                    "FP": 1523,
+                    "IoU": 0.9928920529608222,
+                    "TN": 13954161,
+                    "TP": 442670,
+                    "n_pred": 444193,
+                    "n_ref": 444316
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1044.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1044.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9957829605285575,
+                    "FN": 2670,
+                    "FP": 919,
+                    "IoU": 0.9916013385439824,
+                    "TN": 13972670,
+                    "TP": 423741,
+                    "n_pred": 424660,
+                    "n_ref": 426411
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1045.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1045.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9447117600938906,
+                    "FN": 10094,
+                    "FP": 69661,
+                    "IoU": 0.895216798945796,
+                    "TN": 13638857,
+                    "TP": 681388,
+                    "n_pred": 751049,
+                    "n_ref": 691482
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1046.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1046.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9927542465776233,
+                    "FN": 4322,
+                    "FP": 3511,
+                    "IoU": 0.9856127396958343,
+                    "TN": 13855560,
+                    "TP": 536607,
+                    "n_pred": 540118,
+                    "n_ref": 540929
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1047.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1047.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9925211220869388,
+                    "FN": 3372,
+                    "FP": 2781,
+                    "IoU": 0.9851532809728908,
+                    "TN": 13985565,
+                    "TP": 408282,
+                    "n_pred": 411063,
+                    "n_ref": 411654
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1048.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1048.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9898836772718539,
+                    "FN": 3023,
+                    "FP": 2716,
+                    "IoU": 0.9799699846433059,
+                    "TN": 14113480,
+                    "TP": 280781,
+                    "n_pred": 283497,
+                    "n_ref": 283804
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1049.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1049.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9891933170942522,
+                    "FN": 5986,
+                    "FP": 2816,
+                    "IoU": 0.9786177058610612,
+                    "TN": 13988351,
+                    "TP": 402847,
+                    "n_pred": 405663,
+                    "n_ref": 408833
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1050.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1050.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9945198460172264,
+                    "FN": 1837,
+                    "FP": 3211,
+                    "IoU": 0.989099428842894,
+                    "TN": 13936905,
+                    "TP": 458047,
+                    "n_pred": 461258,
+                    "n_ref": 459884
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1051.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1051.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9956201672994791,
+                    "FN": 3578,
+                    "FP": 1005,
+                    "IoU": 0.9912785331646004,
+                    "TN": 14514515,
+                    "TP": 520902,
+                    "n_pred": 521907,
+                    "n_ref": 524480
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1052.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1052.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9927042379182156,
+                    "FN": 3800,
+                    "FP": 2333,
+                    "IoU": 0.9855141610708136,
+                    "TN": 13976621,
+                    "TP": 417246,
+                    "n_pred": 419579,
+                    "n_ref": 421046
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1053.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1053.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9951246289066307,
+                    "FN": 4709,
+                    "FP": 1295,
+                    "IoU": 0.9902965656565657,
+                    "TN": 13781250,
+                    "TP": 612746,
+                    "n_pred": 614041,
+                    "n_ref": 617455
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1054.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1054.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9916288205763313,
+                    "FN": 4198,
+                    "FP": 1223,
+                    "IoU": 0.9833966309341501,
+                    "TN": 14073500,
+                    "TP": 321079,
+                    "n_pred": 322302,
+                    "n_ref": 325277
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1055.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1055.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9908214644018475,
+                    "FN": 7838,
+                    "FP": 3845,
+                    "IoU": 0.981809887399731,
+                    "TN": 13757728,
+                    "TP": 630589,
+                    "n_pred": 634434,
+                    "n_ref": 638427
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1056.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1056.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9946150541395142,
+                    "FN": 3863,
+                    "FP": 2542,
+                    "IoU": 0.9892877929341245,
+                    "TN": 13802084,
+                    "TP": 591511,
+                    "n_pred": 594053,
+                    "n_ref": 595374
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1057.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1057.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9920058944983314,
+                    "FN": 4358,
+                    "FP": 3432,
+                    "IoU": 0.9841385868071322,
+                    "TN": 13908871,
+                    "TP": 483339,
+                    "n_pred": 486771,
+                    "n_ref": 487697
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1058.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1058.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9912924466853545,
+                    "FN": 3181,
+                    "FP": 3423,
+                    "IoU": 0.9827352272994644,
+                    "TN": 12888527,
+                    "TP": 375909,
+                    "n_pred": 379332,
+                    "n_ref": 379090
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1059.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1059.nii.gz"
+        },
+        {
+            "metrics": {
+                "1": {
+                    "Dice": 0.9952676568776673,
+                    "FN": 4912,
+                    "FP": 1810,
+                    "IoU": 0.990579892934219,
+                    "TN": 13686420,
+                    "TP": 706858,
+                    "n_pred": 708668,
+                    "n_ref": 711770
+                }
+            },
+            "prediction_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/LIVER_1060.nii.gz",
+            "reference_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_raw/Dataset078_LIVER/labelsTr/LIVER_1060.nii.gz"
+        }
+    ]
+}

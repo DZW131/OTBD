@@ -1,0 +1,23 @@
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+
+# Model weights are too large for regular GitHub blobs.
+# Keep them in the server package or use Git LFS/release assets if needed.
+**/checkpoint_*.pth
+
+# Training artifacts
+**/training_log_*.txt
+**/progress.png
+**/debug.json
+
+# Local archives and temporary files
+*.tar
+*.tar.gz
+*.zip
+*.tmp
+*.log
+
+# Editor metadata
+.idea/
+.vscode/

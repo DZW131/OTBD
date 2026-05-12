@@ -1,0 +1,16 @@
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+
+# Not needed for the default inference path in run_infer.sh.
+**/checkpoint_best.pth
+**/training_log_*.txt
+**/progress.png
+**/debug.json
+
+# Local/editor noise.
+.git/
+.idea/
+.vscode/
+*.tmp
+*.log

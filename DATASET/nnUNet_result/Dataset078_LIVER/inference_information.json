@@ -1,0 +1,41 @@
+{
+    "all_results": {
+        "ensemble___nnUNetTrainer__nnUNetPlans__2d___nnUNetTrainer__nnUNetPlans__3d_fullres___0_1_2_3_4": 0.9791067786830142,
+        "nnUNetTrainer__nnUNetPlans__2d": 0.9746696946675774,
+        "nnUNetTrainer__nnUNetPlans__3d_fullres": 0.9824026606709569
+    },
+    "best_model_or_ensemble": {
+        "postprocessing_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/postprocessing.pkl",
+        "result_on_crossval_post_pp": 0.9830651495108381,
+        "result_on_crossval_pre_pp": 0.9824026606709569,
+        "selected_model_or_models": [
+            {
+                "configuration": "3d_fullres",
+                "plans_identifier": "nnUNetPlans",
+                "trainer": "nnUNetTrainer"
+            }
+        ],
+        "some_plans_file": "/home/jincan/long_seg/nnUNet/DATASET/nnUNet_result/Dataset078_LIVER/nnUNetTrainer__nnUNetPlans__3d_fullres/crossval_results_folds_0_1_2_3_4/plans.json"
+    },
+    "considered_models": [
+        {
+            "configuration": "2d",
+            "plans": "nnUNetPlans",
+            "trainer": "nnUNetTrainer"
+        },
+        {
+            "configuration": "3d_fullres",
+            "plans": "nnUNetPlans",
+            "trainer": "nnUNetTrainer"
+        }
+    ],
+    "dataset_name_or_id": "Dataset078_LIVER",
+    "ensembling_allowed": true,
+    "folds": [
+        0,
+        1,
+        2,
+        3,
+        4
+    ]
+}
