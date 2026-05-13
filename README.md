@@ -151,25 +151,60 @@ bash track4_wholeheart/scripts/plan_preprocess.sh mr
 
 ## 7. Train
 
-Single fold:
+Single fold first:
 
 ```bash
 bash track4_wholeheart/scripts/train_nnunet.sh ct 0
 bash track4_wholeheart/scripts/train_nnunet.sh mr 0
 ```
 
-All five folds:
+Full five-fold cross-validation:
 
 ```bash
-for f in 0 1 2 3 4; do bash track4_wholeheart/scripts/train_nnunet.sh ct "$f"; done
-for f in 0 1 2 3 4; do bash track4_wholeheart/scripts/train_nnunet.sh mr "$f"; done
+mkdir -p track4_wholeheart/outputs/logs
+set -o pipefail
+
+for f in 0 1 2 3 4; do
+  bash track4_wholeheart/scripts/train_nnunet.sh ct "$f" 2>&1 | tee -a "track4_wholeheart/outputs/logs/ct_fold${f}.log"
+done
+
+for f in 0 1 2 3 4; do
+  bash track4_wholeheart/scripts/train_nnunet.sh mr "$f" 2>&1 | tee -a "track4_wholeheart/outputs/logs/mr_fold${f}.log"
+done
+```
+
+On a single RTX 4090, run folds sequentially instead of launching CT and MR
+training at the same time. If training is interrupted, rerun the same command;
+nnU-Net resumes from `checkpoint_latest.pth` when available.
+
+Check completed fold checkpoints:
+
+```bash
+find track4_wholeheart/DATASET/nnUNet_result \
+  -path "*Dataset401_CARE2026_WholeHeart_CT*" \
+  -path "*fold_*" \
+  -name "checkpoint_final.pth" | sort
+
+find track4_wholeheart/DATASET/nnUNet_result \
+  -path "*Dataset402_CARE2026_WholeHeart_MR*" \
+  -path "*fold_*" \
+  -name "checkpoint_final.pth" | sort
 ```
 
 ## 8. Predict Validation Set
 
+Single-fold prediction:
+
 ```bash
-bash track4_wholeheart/scripts/predict_val.sh ct
-bash track4_wholeheart/scripts/predict_val.sh mr
+FOLDS="0" bash track4_wholeheart/scripts/predict_val.sh ct
+FOLDS="0" bash track4_wholeheart/scripts/predict_val.sh mr
+```
+
+Five-fold ensemble prediction after all folds are trained:
+
+```bash
+FOLDS="0 1 2 3 4" bash track4_wholeheart/scripts/predict_val.sh ct
+FOLDS="0 1 2 3 4" bash track4_wholeheart/scripts/predict_val.sh mr
 ```
 
 Official-label outputs are written to:
