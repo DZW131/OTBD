@@ -4,6 +4,8 @@ set -euo pipefail
 MODALITY="${1:-}"
 CONFIGURATION="${CONFIGURATION:-3d_fullres}"
 FOLDS="${FOLDS:-}"
+POSTPROCESS="${POSTPROCESS:-0}"
+MIN_COMPONENT_SIZE="${MIN_COMPONENT_SIZE:-0}"
 
 if [[ "${MODALITY}" != "ct" && "${MODALITY}" != "mr" ]]; then
   echo "Usage: $0 {ct|mr}" >&2
@@ -23,6 +25,7 @@ fi
 INPUT_DIR="${nnUNet_raw}/${DATASET_NAME}/imagesTs"
 PRED_DIR="${TRACK4_ROOT}/outputs/${MODALITY}_val_nnunet"
 OFFICIAL_DIR="${TRACK4_ROOT}/outputs/${MODALITY}_val_official_labels"
+POSTPROCESSED_DIR="${TRACK4_ROOT}/outputs/${MODALITY}_val_nnunet_postprocessed"
 MAPPING_JSON="${nnUNet_raw}/${DATASET_NAME}/conversion_mapping.json"
 
 mkdir -p "${PRED_DIR}" "${OFFICIAL_DIR}"
@@ -38,8 +41,19 @@ else
   nnUNetv2_predict -i "${INPUT_DIR}" -o "${PRED_DIR}" -d "${DATASET_ID}" -c "${CONFIGURATION}" --save_probabilities
 fi
 
+RESTORE_SOURCE_DIR="${PRED_DIR}"
+if [[ "${POSTPROCESS}" == "1" ]]; then
+  python "${TRACK4_ROOT}/scripts/postprocess_predictions.py" \
+    --input-dir "${PRED_DIR}" \
+    --output-dir "${POSTPROCESSED_DIR}" \
+    --label-space train \
+    --min-component-size "${MIN_COMPONENT_SIZE}"
+  RESTORE_SOURCE_DIR="${POSTPROCESSED_DIR}"
+  OFFICIAL_DIR="${TRACK4_ROOT}/outputs/${MODALITY}_val_official_labels_postprocessed"
+fi
+
 python "${TRACK4_ROOT}/scripts/restore_label_values.py" \
-  --pred-dir "${PRED_DIR}" \
+  --pred-dir "${RESTORE_SOURCE_DIR}" \
   --mapping-json "${MAPPING_JSON}" \
   --output-dir "${OFFICIAL_DIR}"
 

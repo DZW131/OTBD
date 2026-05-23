@@ -4,6 +4,7 @@ set -euo pipefail
 MODALITY="${1:-}"
 FOLD="${2:-}"
 CONFIGURATION="${CONFIGURATION:-3d_fullres}"
+TRAINER="${TRAINER:-nnUNetTrainer}"
 
 if [[ "${MODALITY}" != "ct" && "${MODALITY}" != "mr" ]]; then
   echo "Usage: $0 {ct|mr} {0|1|2|3|4|all}" >&2
@@ -26,6 +27,7 @@ else
 fi
 
 echo "Training ${MODALITY^^} dataset ${DATASET_ID}, configuration=${CONFIGURATION}, fold=${FOLD}"
+echo "trainer=${TRAINER}"
 echo "TRACK4_ROOT=${TRACK4_ROOT}"
 echo "nnUNet_raw=${nnUNet_raw}"
 echo "nnUNet_preprocessed=${nnUNet_preprocessed}"
@@ -49,4 +51,8 @@ if [[ ! -d "${PREPROCESSED_CONFIGURATION}" ]]; then
   exit 1
 fi
 
-nnUNetv2_train "${DATASET_ID}" "${CONFIGURATION}" "${FOLD}" --npz
+if [[ "${TRAINER}" == "nnUNetTrainerWholeHeartAug" ]]; then
+  python "${TRACK4_ROOT}/scripts/install_wholeheart_trainer.py"
+fi
+
+nnUNetv2_train "${DATASET_ID}" "${CONFIGURATION}" "${FOLD}" -tr "${TRAINER}" --npz

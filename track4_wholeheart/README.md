@@ -21,10 +21,14 @@ track4_wholeheart/
   scripts/convert_to_nnunet.py
   scripts/audit_dataset.py
   scripts/restore_label_values.py
+  scripts/postprocess_predictions.py
+  scripts/summarize_fold_class_metrics.py
+  scripts/install_wholeheart_trainer.py
   scripts/env.sh
   scripts/plan_preprocess.sh
   scripts/train_nnunet.sh
   scripts/predict_val.sh
+  nnunet_extensions/nnUNetTrainerWholeHeartAug.py
   setup_conda_env.sh
   DATASET/                  # generated, ignored by git
   outputs/                  # generated predictions, ignored by git
@@ -313,6 +317,19 @@ Override if needed:
 CONFIGURATION=2d bash track4_wholeheart/scripts/train_nnunet.sh ct 0
 ```
 
+Use the modality-aware intensity augmentation trainer for the first innovation
+run:
+
+```bash
+TRAINER=nnUNetTrainerWholeHeartAug bash track4_wholeheart/scripts/train_nnunet.sh ct 0
+TRAINER=nnUNetTrainerWholeHeartAug bash track4_wholeheart/scripts/train_nnunet.sh mr 0
+```
+
+This copies only `nnUNetTrainerWholeHeartAug.py` into the active nnU-Net
+environment and launches `nnUNetv2_train` with `-tr nnUNetTrainerWholeHeartAug`.
+The default command above still uses the original
+`nnUNetTrainer` baseline.
+
 Notes:
 
 - On a single RTX 4090, run one training job at a time.
@@ -355,6 +372,14 @@ FOLDS="0 1 2 3 4" bash track4_wholeheart/scripts/predict_val.sh ct
 FOLDS="0 1 2 3 4" bash track4_wholeheart/scripts/predict_val.sh mr
 ```
 
+Enable anatomical connected-component post-processing before restoring official
+label values:
+
+```bash
+POSTPROCESS=1 FOLDS="0 1 2 3 4" bash track4_wholeheart/scripts/predict_val.sh ct
+POSTPROCESS=1 FOLDS="0 1 2 3 4" bash track4_wholeheart/scripts/predict_val.sh mr
+```
+
 Raw nnU-Net predictions:
 
 ```text
@@ -368,6 +393,67 @@ Restored official-label predictions:
 track4_wholeheart/outputs/ct_val_official_labels/
 track4_wholeheart/outputs/mr_val_official_labels/
 ```
+
+## Anatomical Post-Processing
+
+Apply connected-component cleanup manually before restoring official labels:
+
+```bash
+python track4_wholeheart/scripts/postprocess_predictions.py \
+  --input-dir track4_wholeheart/outputs/ct_val_nnunet \
+  --output-dir track4_wholeheart/outputs/ct_val_nnunet_postprocessed \
+  --label-space train \
+  --min-component-size 0
+
+python track4_wholeheart/scripts/postprocess_predictions.py \
+  --input-dir track4_wholeheart/outputs/mr_val_nnunet \
+  --output-dir track4_wholeheart/outputs/mr_val_nnunet_postprocessed \
+  --label-space train \
+  --min-component-size 0
+```
+
+Then restore official label values from the postprocessed directory:
+
+```bash
+python track4_wholeheart/scripts/restore_label_values.py \
+  --pred-dir track4_wholeheart/outputs/ct_val_nnunet_postprocessed \
+  --mapping-json track4_wholeheart/DATASET/nnUNet_raw/Dataset401_CARE2026_WholeHeart_CT/conversion_mapping.json \
+  --output-dir track4_wholeheart/outputs/ct_val_official_labels_postprocessed
+
+python track4_wholeheart/scripts/restore_label_values.py \
+  --pred-dir track4_wholeheart/outputs/mr_val_nnunet_postprocessed \
+  --mapping-json track4_wholeheart/DATASET/nnUNet_raw/Dataset402_CARE2026_WholeHeart_MR/conversion_mapping.json \
+  --output-dir track4_wholeheart/outputs/mr_val_official_labels_postprocessed
+```
+
+If predictions have already been restored to official labels, run
+`postprocess_predictions.py` with `--label-space official`.
+
+## Per-Class Fold Metrics
+
+Summarize the seven whole-heart classes per fold from nnU-Net validation
+summaries, training logs, or prediction/reference folders:
+
+```bash
+python track4_wholeheart/scripts/summarize_fold_class_metrics.py \
+  --modality ct \
+  --results-root track4_wholeheart/DATASET/nnUNet_result/Dataset401_CARE2026_WholeHeart_CT/nnUNetTrainer__nnUNetPlans__3d_fullres \
+  --training-log-dir track4_wholeheart/outputs/logs \
+  --output-csv track4_wholeheart/outputs/metrics/ct_fold_class_metrics.csv \
+  --output-md track4_wholeheart/outputs/metrics/ct_fold_class_metrics.md
+
+python track4_wholeheart/scripts/summarize_fold_class_metrics.py \
+  --modality mr \
+  --results-root track4_wholeheart/DATASET/nnUNet_result/Dataset402_CARE2026_WholeHeart_MR/nnUNetTrainer__nnUNetPlans__3d_fullres \
+  --training-log-dir track4_wholeheart/outputs/logs \
+  --output-csv track4_wholeheart/outputs/metrics/mr_fold_class_metrics.csv \
+  --output-md track4_wholeheart/outputs/metrics/mr_fold_class_metrics.md
+```
+
+For the augmentation trainer, replace `nnUNetTrainer__...` with
+`nnUNetTrainerWholeHeartAug__...`. When validation references are available,
+you can also pass `--pred-dir` and `--ref-dir` to compute Dice directly from
+NIfTI files.
 
 ## Label Mapping
 
@@ -428,6 +514,9 @@ bash track4_wholeheart/scripts/plan_preprocess.sh mr
 
 bash track4_wholeheart/scripts/train_nnunet.sh ct 0
 bash track4_wholeheart/scripts/train_nnunet.sh mr 0
+
+TRAINER=nnUNetTrainerWholeHeartAug bash track4_wholeheart/scripts/train_nnunet.sh ct 0
+TRAINER=nnUNetTrainerWholeHeartAug bash track4_wholeheart/scripts/train_nnunet.sh mr 0
 ```
 
 ## Troubleshooting Notes
