@@ -1,4 +1,5 @@
 from pathlib import Path
+import ast
 
 import numpy as np
 
@@ -93,3 +94,31 @@ def test_safe_mean_returns_nan_when_class_absent():
     value = safe_mean([float("nan"), float("nan")])
 
     assert np.isnan(value)
+
+
+def test_wholeheart_trainers_use_explicit_nnunet_init_signature():
+    source = Path("track4_wholeheart/nnunet_extensions/nnUNetTrainerWholeHeartAug.py").read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    trainer_names = {
+        "nnUNetTrainerWholeHeartAug",
+        "nnUNetTrainerWholeHeartRHM",
+        "nnUNetTrainerWholeHeartRHMMeanTeacher",
+    }
+    init_methods = {}
+    for node in tree.body:
+        if isinstance(node, ast.ClassDef) and node.name in trainer_names:
+            init_methods[node.name] = next(
+                child for child in node.body if isinstance(child, ast.FunctionDef) and child.name == "__init__"
+            )
+
+    assert set(init_methods) == trainer_names
+    for name, init_method in init_methods.items():
+        assert init_method.args.vararg is None, f"{name}.__init__ must not use *args"
+        assert init_method.args.kwarg is None, f"{name}.__init__ must not use **kwargs"
+        assert [arg.arg for arg in init_method.args.args[:5]] == [
+            "self",
+            "plans",
+            "configuration",
+            "fold",
+            "dataset_json",
+        ]
