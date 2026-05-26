@@ -122,3 +122,34 @@ def test_wholeheart_trainers_use_explicit_nnunet_init_signature():
             "fold",
             "dataset_json",
         ]
+
+
+def test_wholeheart_trainers_call_nnunet_init_with_compatible_keywords():
+    source = Path("track4_wholeheart/nnunet_extensions/nnUNetTrainerWholeHeartAug.py").read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    trainer_names = {
+        "nnUNetTrainerWholeHeartAug",
+        "nnUNetTrainerWholeHeartRHM",
+        "nnUNetTrainerWholeHeartRHMMeanTeacher",
+    }
+    expected_keywords = ["plans", "configuration", "fold", "dataset_json", "device"]
+
+    for node in tree.body:
+        if not isinstance(node, ast.ClassDef) or node.name not in trainer_names:
+            continue
+        init_method = next(child for child in node.body if isinstance(child, ast.FunctionDef) and child.name == "__init__")
+        super_calls = [
+            child
+            for child in ast.walk(init_method)
+            if isinstance(child, ast.Call)
+            and isinstance(child.func, ast.Attribute)
+            and child.func.attr == "__init__"
+            and isinstance(child.func.value, ast.Call)
+            and isinstance(child.func.value.func, ast.Name)
+            and child.func.value.func.id == "super"
+        ]
+
+        assert len(super_calls) == 1
+        super_call = super_calls[0]
+        assert super_call.args == [], f"{node.name}.__init__ should call super().__init__ with keywords"
+        assert [keyword.arg for keyword in super_call.keywords] == expected_keywords

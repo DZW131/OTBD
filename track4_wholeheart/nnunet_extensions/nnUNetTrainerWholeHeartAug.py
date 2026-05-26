@@ -227,7 +227,13 @@ class nnUNetTrainerWholeHeartAug(nnUNetTrainer):
         unpack_dataset: bool = True,
         device: torch.device = torch.device("cuda"),
     ):
-        super().__init__(plans, configuration, fold, dataset_json, unpack_dataset, device)
+        super().__init__(
+            plans=plans,
+            configuration=configuration,
+            fold=fold,
+            dataset_json=dataset_json,
+            device=device,
+        )
         self.rhm_probability = _env_float("WHOLEHEART_RHM_PROB", self.default_rhm_probability)
         self.rhm_num_bins = _env_int("WHOLEHEART_RHM_BINS", 256)
         self.rhm_blend = _env_float("WHOLEHEART_RHM_BLEND", self.default_rhm_blend)
@@ -531,7 +537,13 @@ class nnUNetTrainerWholeHeartRHM(nnUNetTrainerWholeHeartAug):
         unpack_dataset: bool = True,
         device: torch.device = torch.device("cuda"),
     ):
-        super().__init__(plans, configuration, fold, dataset_json, unpack_dataset, device)
+        super().__init__(
+            plans=plans,
+            configuration=configuration,
+            fold=fold,
+            dataset_json=dataset_json,
+            device=device,
+        )
         if "WHOLEHEART_RHM_PROB" not in os.environ and self._modality() == "mr":
             self.rhm_probability = 0.5
 
@@ -548,7 +560,13 @@ class nnUNetTrainerWholeHeartRHMMeanTeacher(nnUNetTrainerWholeHeartRHM):
         unpack_dataset: bool = True,
         device: torch.device = torch.device("cuda"),
     ):
-        super().__init__(plans, configuration, fold, dataset_json, unpack_dataset, device)
+        super().__init__(
+            plans=plans,
+            configuration=configuration,
+            fold=fold,
+            dataset_json=dataset_json,
+            device=device,
+        )
         self.mt_enabled = _env_bool("WHOLEHEART_MT", True)
         self.mt_start_epoch = _env_int("WHOLEHEART_MT_START_EPOCH", 40)
         self.mt_rampup_epochs = _env_int("WHOLEHEART_MT_RAMPUP_EPOCHS", 80)
