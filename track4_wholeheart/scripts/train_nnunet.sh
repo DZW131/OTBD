@@ -51,7 +51,7 @@ if [[ ! -d "${PREPROCESSED_CONFIGURATION}" ]]; then
   exit 1
 fi
 
-if [[ "${TRAINER}" == "nnUNetTrainerWholeHeartAug" ]]; then
+if [[ "${TRAINER}" == nnUNetTrainerWholeHeart* ]]; then
   python "${TRACK4_ROOT}/scripts/install_wholeheart_trainer.py"
 fi
 

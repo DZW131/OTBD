@@ -330,6 +330,58 @@ environment and launches `nnUNetv2_train` with `-tr nnUNetTrainerWholeHeartAug`.
 The default command above still uses the original
 `nnUNetTrainer` baseline.
 
+Random histogram matching and mean-teacher variants are exposed as separate
+trainer names so ablations can be run from the command line:
+
+```bash
+# Strong CT/MR augmentation + random histogram matching
+TRAINER=nnUNetTrainerWholeHeartRHM bash track4_wholeheart/scripts/train_nnunet.sh ct 0
+TRAINER=nnUNetTrainerWholeHeartRHM bash track4_wholeheart/scripts/train_nnunet.sh mr 0
+
+# Random histogram matching + mean-teacher consistency
+TRAINER=nnUNetTrainerWholeHeartRHMMeanTeacher bash track4_wholeheart/scripts/train_nnunet.sh ct 0
+TRAINER=nnUNetTrainerWholeHeartRHMMeanTeacher bash track4_wholeheart/scripts/train_nnunet.sh mr 0
+```
+
+The mean-teacher trainer uses labeled `imagesTr/labelsTr` for supervised
+Dice/CE loss, and by default samples unlabeled patches from the converted
+official validation images in `imagesTs`. Those validation images have no
+labels and are used only for consistency loss. Use this only if the challenge
+rules allow unlabeled validation images during training; otherwise set
+`WHOLEHEART_MT_UNLABELED_MODE=labeled_batch`. The original official files are
+copied there by `convert_to_nnunet.py` from paths such as:
+
+```text
+/home/data/jingkun/duyanhong/dataspace/track4_wholeheart/Wholeheart_Val_Dataset/ct_val/CaseCTVal001_image.nii.gz
+/home/data/jingkun/duyanhong/dataspace/track4_wholeheart/Wholeheart_Val_Dataset/mr_val/CaseMRVal001_image.nii.gz
+```
+
+Useful ablation switches:
+
+```bash
+# Disable random histogram matching even when using the RHM trainer
+WHOLEHEART_RHM_PROB=0 TRAINER=nnUNetTrainerWholeHeartRHM \
+  bash track4_wholeheart/scripts/train_nnunet.sh mr 0
+
+# Keep mean teacher but use only labeled training batches as unlabeled views
+WHOLEHEART_MT_UNLABELED_MODE=labeled_batch \
+  TRAINER=nnUNetTrainerWholeHeartRHMMeanTeacher \
+  bash track4_wholeheart/scripts/train_nnunet.sh mr 0
+
+# Disable mean teacher inside the combined trainer
+WHOLEHEART_MT=0 TRAINER=nnUNetTrainerWholeHeartRHMMeanTeacher \
+  bash track4_wholeheart/scripts/train_nnunet.sh mr 0
+
+# Tune random histogram matching probability
+WHOLEHEART_RHM_PROB=0.3 TRAINER=nnUNetTrainerWholeHeartRHM \
+  bash track4_wholeheart/scripts/train_nnunet.sh ct 0
+
+# Tune mean-teacher schedule
+WHOLEHEART_MT_START_EPOCH=40 WHOLEHEART_MT_RAMPUP_EPOCHS=80 WHOLEHEART_MT_MAX_WEIGHT=1.0 \
+  TRAINER=nnUNetTrainerWholeHeartRHMMeanTeacher \
+  bash track4_wholeheart/scripts/train_nnunet.sh mr 0
+```
+
 Notes:
 
 - On a single RTX 4090, run one training job at a time.
@@ -363,6 +415,14 @@ After training:
 ```bash
 FOLDS="0" bash track4_wholeheart/scripts/predict_val.sh ct
 FOLDS="0" bash track4_wholeheart/scripts/predict_val.sh mr
+```
+
+For whole-heart trainer variants, pass the same trainer name used during
+training:
+
+```bash
+TRAINER=nnUNetTrainerWholeHeartRHM FOLDS="0" bash track4_wholeheart/scripts/predict_val.sh mr
+TRAINER=nnUNetTrainerWholeHeartRHMMeanTeacher FOLDS="0" bash track4_wholeheart/scripts/predict_val.sh mr
 ```
 
 Use all five folds for ensemble prediction after full cross-validation:

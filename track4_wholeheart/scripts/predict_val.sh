@@ -3,6 +3,7 @@ set -euo pipefail
 
 MODALITY="${1:-}"
 CONFIGURATION="${CONFIGURATION:-3d_fullres}"
+TRAINER="${TRAINER:-nnUNetTrainer}"
 FOLDS="${FOLDS:-}"
 POSTPROCESS="${POSTPROCESS:-0}"
 MIN_COMPONENT_SIZE="${MIN_COMPONENT_SIZE:-0}"
@@ -33,12 +34,17 @@ mkdir -p "${PRED_DIR}" "${OFFICIAL_DIR}"
 echo "Predicting ${MODALITY^^} validation set"
 echo "Input: ${INPUT_DIR}"
 echo "Prediction dir: ${PRED_DIR}"
+echo "trainer=${TRAINER}"
+
+if [[ "${TRAINER}" == nnUNetTrainerWholeHeart* ]]; then
+  python "${TRACK4_ROOT}/scripts/install_wholeheart_trainer.py"
+fi
 
 if [[ -n "${FOLDS}" ]]; then
   # shellcheck disable=SC2086
-  nnUNetv2_predict -i "${INPUT_DIR}" -o "${PRED_DIR}" -d "${DATASET_ID}" -c "${CONFIGURATION}" -f ${FOLDS} --save_probabilities
+  nnUNetv2_predict -i "${INPUT_DIR}" -o "${PRED_DIR}" -d "${DATASET_ID}" -c "${CONFIGURATION}" -tr "${TRAINER}" -f ${FOLDS} --save_probabilities
 else
-  nnUNetv2_predict -i "${INPUT_DIR}" -o "${PRED_DIR}" -d "${DATASET_ID}" -c "${CONFIGURATION}" --save_probabilities
+  nnUNetv2_predict -i "${INPUT_DIR}" -o "${PRED_DIR}" -d "${DATASET_ID}" -c "${CONFIGURATION}" -tr "${TRAINER}" --save_probabilities
 fi
 
 RESTORE_SOURCE_DIR="${PRED_DIR}"
