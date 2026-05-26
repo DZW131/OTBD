@@ -115,6 +115,10 @@ def test_wholeheart_trainers_use_explicit_nnunet_init_signature():
     for name, init_method in init_methods.items():
         assert init_method.args.vararg is None, f"{name}.__init__ must not use *args"
         assert init_method.args.kwarg is None, f"{name}.__init__ must not use **kwargs"
+        assert "unpack_dataset" not in [arg.arg for arg in init_method.args.args], (
+            f"{name}.__init__ must not expose unpack_dataset because older nnU-Net "
+            "base trainers reflect child init parameters"
+        )
         assert [arg.arg for arg in init_method.args.args[:5]] == [
             "self",
             "plans",

@@ -224,7 +224,6 @@ class nnUNetTrainerWholeHeartAug(nnUNetTrainer):
         configuration: str,
         fold: int,
         dataset_json: dict,
-        unpack_dataset: bool = True,
         device: torch.device = torch.device("cuda"),
     ):
         super().__init__(
@@ -534,7 +533,6 @@ class nnUNetTrainerWholeHeartRHM(nnUNetTrainerWholeHeartAug):
         configuration: str,
         fold: int,
         dataset_json: dict,
-        unpack_dataset: bool = True,
         device: torch.device = torch.device("cuda"),
     ):
         super().__init__(
@@ -557,7 +555,6 @@ class nnUNetTrainerWholeHeartRHMMeanTeacher(nnUNetTrainerWholeHeartRHM):
         configuration: str,
         fold: int,
         dataset_json: dict,
-        unpack_dataset: bool = True,
         device: torch.device = torch.device("cuda"),
     ):
         super().__init__(
