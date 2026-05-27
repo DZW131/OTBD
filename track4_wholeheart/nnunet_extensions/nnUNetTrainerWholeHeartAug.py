@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-from collections import OrderedDict
 from copy import deepcopy
 from pathlib import Path
 from typing import List, Tuple, Union
@@ -35,6 +34,11 @@ from nnunetv2.paths import nnUNet_raw
 from nnunetv2.utilities.helpers import dummy_context
 from nnunetv2.training.nnUNetTrainer.nnUNetTrainer import nnUNetTrainer
 from torch import autocast
+
+try:
+    from track4_wholeheart.nnunet_extensions.unlabeled_pool import WholeHeartRawUnlabeledPool
+except ModuleNotFoundError:  # pragma: no cover - used after install into nnU-Net variants
+    from nnunetv2.training.nnUNetTrainer.variants.wholeheart.unlabeled_pool import WholeHeartRawUnlabeledPool
 
 try:
     from torch._dynamo import OptimizedModule
@@ -135,81 +139,6 @@ def load_model_state_dict(model: torch.nn.Module, state_dict: dict) -> None:
     if OptimizedModule and isinstance(module, OptimizedModule):
         module = module._orig_mod
     module.load_state_dict(state_dict)
-
-
-class WholeHeartRawUnlabeledPool:
-    """Lightweight unlabeled patch sampler for official validation imagesTs."""
-
-    def __init__(self, image_dir: Path, patch_size: Tuple[int, ...], modality: str, cache_size: int = 2):
-        self.image_dir = Path(image_dir)
-        self.patch_size = tuple(int(v) for v in patch_size)
-        self.modality = modality
-        self.cache_size = max(1, int(cache_size))
-        self.image_paths = sorted(self.image_dir.glob("*.nii.gz"))
-        self._cache: OrderedDict[Path, torch.Tensor] = OrderedDict()
-        if not self.image_paths:
-            raise FileNotFoundError(f"No .nii.gz images found in unlabeled image dir: {self.image_dir}")
-
-    def _read_image(self, path: Path) -> torch.Tensor:
-        try:
-            import SimpleITK as sitk
-        except ImportError as exc:
-            raise RuntimeError("SimpleITK is required for raw imagesTs mean-teacher sampling.") from exc
-
-        image = sitk.ReadImage(str(path))
-        array = sitk.GetArrayFromImage(image).astype(np.float32, copy=False)
-        finite = np.isfinite(array)
-        if not np.any(finite):
-            array = np.zeros_like(array, dtype=np.float32)
-        else:
-            values = array[finite]
-            if self.modality == "ct":
-                lower, upper = np.percentile(values, [0.5, 99.5])
-                array = np.clip(array, lower, upper)
-                values = array[finite]
-            mean = float(values.mean())
-            std = float(values.std())
-            array = (array - mean) / max(std, 1e-8)
-            array[~finite] = 0
-        return torch.from_numpy(array.copy()).float()
-
-    def _get_volume(self, path: Path) -> torch.Tensor:
-        cached = self._cache.get(path)
-        if cached is not None:
-            self._cache.move_to_end(path)
-            return cached
-
-        volume = self._read_image(path)
-        self._cache[path] = volume
-        self._cache.move_to_end(path)
-        while len(self._cache) > self.cache_size:
-            self._cache.popitem(last=False)
-        return volume
-
-    def _pad_if_needed(self, volume: torch.Tensor) -> torch.Tensor:
-        pad = []
-        for size, target in zip(reversed(volume.shape), reversed(self.patch_size)):
-            missing = max(0, target - int(size))
-            pad.extend([missing // 2, missing - missing // 2])
-        if any(pad):
-            volume = F.pad(volume, pad, mode="constant", value=0)
-        return volume
-
-    def _random_patch(self, volume: torch.Tensor) -> torch.Tensor:
-        volume = self._pad_if_needed(volume)
-        starts = []
-        for size, target in zip(volume.shape, self.patch_size):
-            max_start = int(size) - int(target)
-            starts.append(0 if max_start <= 0 else int(torch.randint(max_start + 1, (), dtype=torch.int64).item()))
-        slices = tuple(slice(start, start + target) for start, target in zip(starts, self.patch_size))
-        return volume[slices].unsqueeze(0)
-
-    def sample_batch(self, batch_size: int, device: torch.device, dtype: torch.dtype) -> torch.Tensor:
-        patches = []
-        for _ in range(batch_size):
-            path = self.image_paths[int(torch.randint(len(self.image_paths), (), dtype=torch.int64).item())]
-            patches.append(self._random_patch(self._get_volume(path)))
-        return torch.stack(patches, dim=0).to(device=device, dtype=dtype, non_blocking=True)
 
 
 class nnUNetTrainerWholeHeartAug(nnUNetTrainer):
@@ -577,6 +506,7 @@ class nnUNetTrainerWholeHeartRHMMeanTeacher(nnUNetTrainerWholeHeartRHM):
         self.mt_unlabeled_mode = os.environ.get("WHOLEHEART_MT_UNLABELED_MODE", "imagesTs").strip().lower()
         self.mt_unlabeled_image_dir = os.environ.get("WHOLEHEART_MT_UNLABELED_IMAGE_DIR", "")
         self.mt_unlabeled_cache_size = _env_int("WHOLEHEART_MT_UNLABELED_CACHE", 2)
+        self.mt_unlabeled_patch_cache_size = _env_int("WHOLEHEART_MT_PATCH_CACHE", 128)
         self.mt_unlabeled_pool = None
         self.teacher_network = None
 
@@ -600,7 +530,8 @@ class nnUNetTrainerWholeHeartRHMMeanTeacher(nnUNetTrainerWholeHeartRHM):
                 f"student_contrast={self.mt_student_contrast}, teacher_contrast={self.mt_teacher_contrast}, "
                 f"student_rhm_probability={self.mt_student_rhm_probability}, "
                 f"unlabeled_mode={self.mt_unlabeled_mode}, "
-                f"unlabeled_pool_size={len(self.mt_unlabeled_pool.image_paths) if self.mt_unlabeled_pool else 0}",
+                f"unlabeled_pool_size={len(self.mt_unlabeled_pool.image_paths) if self.mt_unlabeled_pool else 0}, "
+                f"unlabeled_patch_cache_size={self.mt_unlabeled_patch_cache_size if self.mt_unlabeled_pool else 0}",
                 also_print_to_console=True,
             )
 
@@ -626,6 +557,7 @@ class nnUNetTrainerWholeHeartRHMMeanTeacher(nnUNetTrainerWholeHeartRHM):
                 patch_size=tuple(int(v) for v in self.configuration_manager.patch_size),
                 modality=self._modality(),
                 cache_size=self.mt_unlabeled_cache_size,
+                patch_cache_size=self.mt_unlabeled_patch_cache_size,
             )
         except FileNotFoundError:
             self.print_to_log_file(

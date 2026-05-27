@@ -2,7 +2,9 @@ from pathlib import Path
 import ast
 
 import numpy as np
+import torch
 
+from track4_wholeheart.nnunet_extensions.unlabeled_pool import WholeHeartRawUnlabeledPool
 from track4_wholeheart.scripts.postprocess_predictions import postprocess_label_array
 from track4_wholeheart.scripts.summarize_fold_class_metrics import (
     dice_per_label,
@@ -157,3 +159,37 @@ def test_wholeheart_trainers_call_nnunet_init_with_compatible_keywords():
         super_call = super_calls[0]
         assert super_call.args == [], f"{node.name}.__init__ should call super().__init__ with keywords"
         assert [keyword.arg for keyword in super_call.keywords] == expected_keywords
+
+
+def test_raw_unlabeled_pool_reuses_cached_patches(monkeypatch, tmp_path):
+    for idx in range(3):
+        (tmp_path / f"case_{idx:03d}_0000.nii.gz").touch()
+
+    pool = WholeHeartRawUnlabeledPool(
+        image_dir=tmp_path,
+        patch_size=(2, 2, 2),
+        modality="ct",
+        cache_size=1,
+        patch_cache_size=6,
+    )
+    reads = []
+
+    def fake_read_image(path):
+        reads.append(path)
+        base = float(len(reads))
+        return torch.full((4, 4, 4), base, dtype=torch.float32)
+
+    monkeypatch.setattr(pool, "_read_image", fake_read_image)
+
+    first = pool.sample_batch(batch_size=2, device=torch.device("cpu"), dtype=torch.float32)
+    second = pool.sample_batch(batch_size=2, device=torch.device("cpu"), dtype=torch.float32)
+
+    assert first.shape == (2, 1, 2, 2, 2)
+    assert second.shape == (2, 1, 2, 2, 2)
+    assert len(reads) == 3
+
+
+def test_install_script_copies_unlabeled_pool_helper():
+    source = Path("track4_wholeheart/scripts/install_wholeheart_trainer.py").read_text(encoding="utf-8")
+
+    assert "unlabeled_pool.py" in source

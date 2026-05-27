@@ -346,10 +346,13 @@ TRAINER=nnUNetTrainerWholeHeartRHMMeanTeacher bash track4_wholeheart/scripts/tra
 The mean-teacher trainer uses labeled `imagesTr/labelsTr` for supervised
 Dice/CE loss, and by default samples unlabeled patches from the converted
 official validation images in `imagesTs`. Those validation images have no
-labels and are used only for consistency loss. Use this only if the challenge
-rules allow unlabeled validation images during training; otherwise set
-`WHOLEHEART_MT_UNLABELED_MODE=labeled_batch`. The original official files are
-copied there by `convert_to_nnunet.py` from paths such as:
+labels and are used only for consistency loss. To avoid repeatedly reading
+raw `.nii.gz` volumes after mean teacher starts, it caches sampled unlabeled
+patches on CPU; the default is `WHOLEHEART_MT_PATCH_CACHE=128`. Use the
+`imagesTs` path only if the challenge rules allow unlabeled validation images
+during training; otherwise set `WHOLEHEART_MT_UNLABELED_MODE=labeled_batch`.
+The original official files are copied there by `convert_to_nnunet.py` from
+paths such as:
 
 ```text
 /home/data/jingkun/duyanhong/dataspace/track4_wholeheart/Wholeheart_Val_Dataset/ct_val/CaseCTVal001_image.nii.gz
@@ -367,6 +370,11 @@ WHOLEHEART_RHM_PROB=0 TRAINER=nnUNetTrainerWholeHeartRHM \
 WHOLEHEART_MT_UNLABELED_MODE=labeled_batch \
   TRAINER=nnUNetTrainerWholeHeartRHMMeanTeacher \
   bash track4_wholeheart/scripts/train_nnunet.sh mr 0
+
+# Keep imagesTs unlabeled data but reduce CPU patch cache memory
+WHOLEHEART_MT_PATCH_CACHE=64 \
+  TRAINER=nnUNetTrainerWholeHeartRHMMeanTeacher \
+  bash track4_wholeheart/scripts/train_nnunet.sh ct 0
 
 # Disable mean teacher inside the combined trainer
 WHOLEHEART_MT=0 TRAINER=nnUNetTrainerWholeHeartRHMMeanTeacher \
