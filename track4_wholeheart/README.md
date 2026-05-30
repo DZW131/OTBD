@@ -362,6 +362,10 @@ paths such as:
 Useful ablation switches:
 
 ```bash
+# Shorten a pilot run to 600 epochs instead of the nnU-Net default
+WHOLEHEART_NUM_EPOCHS=600 TRAINER=nnUNetTrainerWholeHeartRHMMeanTeacher \
+  bash track4_wholeheart/scripts/train_nnunet.sh mr 0
+
 # Disable random histogram matching even when using the RHM trainer
 WHOLEHEART_RHM_PROB=0 TRAINER=nnUNetTrainerWholeHeartRHM \
   bash track4_wholeheart/scripts/train_nnunet.sh mr 0
@@ -393,6 +397,10 @@ WHOLEHEART_MT_START_EPOCH=40 WHOLEHEART_MT_RAMPUP_EPOCHS=80 WHOLEHEART_MT_MAX_WE
 Notes:
 
 - On a single RTX 4090, run one training job at a time.
+- `WHOLEHEART_NUM_EPOCHS` changes the trainer's total epoch count and therefore
+  the nnU-Net learning-rate schedule. Use a separate `nnUNet_results` directory
+  for shortened runs so 600-epoch experiments do not resume from or overwrite
+  older 1000-epoch runs.
 - If training is interrupted, rerun the same command; nnU-Net resumes from
   `checkpoint_latest.pth` when available.
 - Fold `all` is not the same as five-fold cross-validation. Use folds `0 1 2 3 4`

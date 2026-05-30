@@ -162,6 +162,7 @@ class nnUNetTrainerWholeHeartAug(nnUNetTrainer):
             dataset_json=dataset_json,
             device=device,
         )
+        self.num_epochs = _env_int("WHOLEHEART_NUM_EPOCHS", self.num_epochs)
         self.rhm_probability = _env_float("WHOLEHEART_RHM_PROB", self.default_rhm_probability)
         self.rhm_num_bins = _env_int("WHOLEHEART_RHM_BINS", 256)
         self.rhm_blend = _env_float("WHOLEHEART_RHM_BLEND", self.default_rhm_blend)
@@ -187,6 +188,7 @@ class nnUNetTrainerWholeHeartAug(nnUNetTrainer):
         self.print_to_log_file(
             "WholeHeart trainer config: "
             f"trainer={self.__class__.__name__}, modality={self._modality()}, "
+            f"num_epochs={self.num_epochs}, "
             f"rhm_probability={self.rhm_probability}, rhm_bins={self.rhm_num_bins}, "
             f"rhm_blend={self.rhm_blend}",
             also_print_to_console=True,

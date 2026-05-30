@@ -161,6 +161,42 @@ def test_wholeheart_trainers_call_nnunet_init_with_compatible_keywords():
         assert [keyword.arg for keyword in super_call.keywords] == expected_keywords
 
 
+def test_wholeheart_trainer_allows_epoch_count_env_override():
+    source = Path("track4_wholeheart/nnunet_extensions/nnUNetTrainerWholeHeartAug.py").read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    trainer_class = next(
+        node
+        for node in tree.body
+        if isinstance(node, ast.ClassDef) and node.name == "nnUNetTrainerWholeHeartAug"
+    )
+    init_method = next(
+        child for child in trainer_class.body if isinstance(child, ast.FunctionDef) and child.name == "__init__"
+    )
+
+    epoch_assignments = [
+        node
+        for node in ast.walk(init_method)
+        if isinstance(node, ast.Assign)
+        and any(
+            isinstance(target, ast.Attribute)
+            and isinstance(target.value, ast.Name)
+            and target.value.id == "self"
+            and target.attr == "num_epochs"
+            for target in node.targets
+        )
+    ]
+
+    assert any(
+        isinstance(node.value, ast.Call)
+        and isinstance(node.value.func, ast.Name)
+        and node.value.func.id == "_env_int"
+        and len(node.value.args) == 2
+        and isinstance(node.value.args[0], ast.Constant)
+        and node.value.args[0].value == "WHOLEHEART_NUM_EPOCHS"
+        for node in epoch_assignments
+    )
+
+
 def test_raw_unlabeled_pool_reuses_cached_patches(monkeypatch, tmp_path):
     for idx in range(3):
         (tmp_path / f"case_{idx:03d}_0000.nii.gz").touch()
