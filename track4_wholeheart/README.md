@@ -392,6 +392,11 @@ WHOLEHEART_RHM_PROB=0.3 TRAINER=nnUNetTrainerWholeHeartRHM \
 WHOLEHEART_MT_START_EPOCH=40 WHOLEHEART_MT_RAMPUP_EPOCHS=80 WHOLEHEART_MT_MAX_WEIGHT=1.0 \
   TRAINER=nnUNetTrainerWholeHeartRHMMeanTeacher \
   bash track4_wholeheart/scripts/train_nnunet.sh mr 0
+
+# Add supervised signed-distance-field boundary loss on labeled imagesTr data
+WHOLEHEART_SDF=1 WHOLEHEART_SDF_WEIGHT=0.005 \
+  TRAINER=nnUNetTrainerWholeHeartRHMMeanTeacher \
+  bash track4_wholeheart/scripts/train_nnunet.sh mr 0
 ```
 
 Notes:
@@ -401,6 +406,11 @@ Notes:
   the nnU-Net learning-rate schedule. Use a separate `nnUNet_results` directory
   for shortened runs so 600-epoch experiments do not resume from or overwrite
   older 1000-epoch runs.
+- `WHOLEHEART_SDF=1` adds an SDF-derived boundary loss only to the supervised
+  labeled branch. It does not use unlabeled `imagesTs` labels and does not alter
+  the mean-teacher consistency term. Start with `WHOLEHEART_SDF_WEIGHT=0.005`;
+  `0.01` is the next reasonable strength if the boundary-sensitive classes
+  such as Myo, AO, PA, or RV still need more pressure.
 - If training is interrupted, rerun the same command; nnU-Net resumes from
   `checkpoint_latest.pth` when available.
 - Fold `all` is not the same as five-fold cross-validation. Use folds `0 1 2 3 4`

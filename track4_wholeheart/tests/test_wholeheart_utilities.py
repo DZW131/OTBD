@@ -1,5 +1,6 @@
 from pathlib import Path
 import ast
+import importlib
 
 import numpy as np
 import torch
@@ -197,6 +198,65 @@ def test_wholeheart_trainer_allows_epoch_count_env_override():
     )
 
 
+def test_sdf_boundary_loss_prefers_predictions_inside_object():
+    module = importlib.import_module("track4_wholeheart.nnunet_extensions.sdf_boundary_loss")
+    assert hasattr(module, "sdf_boundary_loss_from_logits")
+
+    target = torch.zeros((1, 1, 5, 5, 5), dtype=torch.long)
+    target[0, 0, 1:4, 1:4, 1:4] = 1
+
+    good_logits = torch.zeros((1, 2, 5, 5, 5), dtype=torch.float32)
+    good_logits[:, 0] = 3
+    good_logits[:, 1] = -3
+    good_logits[:, 0, 1:4, 1:4, 1:4] = -3
+    good_logits[:, 1, 1:4, 1:4, 1:4] = 3
+
+    bad_logits = -good_logits
+
+    good_loss = module.sdf_boundary_loss_from_logits(good_logits, target)
+    bad_loss = module.sdf_boundary_loss_from_logits(bad_logits, target)
+
+    assert good_loss < bad_loss
+
+
+def test_wholeheart_trainer_exposes_sdf_env_switches():
+    source = Path("track4_wholeheart/nnunet_extensions/nnUNetTrainerWholeHeartAug.py").read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    trainer_class = next(
+        node
+        for node in tree.body
+        if isinstance(node, ast.ClassDef) and node.name == "nnUNetTrainerWholeHeartAug"
+    )
+    init_method = next(
+        child for child in trainer_class.body if isinstance(child, ast.FunctionDef) and child.name == "__init__"
+    )
+
+    assert "WHOLEHEART_SDF" in source
+    assert "WHOLEHEART_SDF_WEIGHT" in source
+    assert any(
+        isinstance(node, ast.Assign)
+        and any(
+            isinstance(target, ast.Attribute)
+            and isinstance(target.value, ast.Name)
+            and target.value.id == "self"
+            and target.attr == "sdf_enabled"
+            for target in node.targets
+        )
+        for node in ast.walk(init_method)
+    )
+    assert any(
+        isinstance(node, ast.Assign)
+        and any(
+            isinstance(target, ast.Attribute)
+            and isinstance(target.value, ast.Name)
+            and target.value.id == "self"
+            and target.attr == "sdf_weight"
+            for target in node.targets
+        )
+        for node in ast.walk(init_method)
+    )
+
+
 def test_raw_unlabeled_pool_reuses_cached_patches(monkeypatch, tmp_path):
     for idx in range(3):
         (tmp_path / f"case_{idx:03d}_0000.nii.gz").touch()
@@ -229,3 +289,4 @@ def test_install_script_copies_unlabeled_pool_helper():
     source = Path("track4_wholeheart/scripts/install_wholeheart_trainer.py").read_text(encoding="utf-8")
 
     assert "unlabeled_pool.py" in source
+    assert "sdf_boundary_loss.py" in source

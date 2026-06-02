@@ -37,8 +37,10 @@ from torch import autocast
 
 try:
     from track4_wholeheart.nnunet_extensions.unlabeled_pool import WholeHeartRawUnlabeledPool
+    from track4_wholeheart.nnunet_extensions.sdf_boundary_loss import WholeHeartSDFBoundaryLoss
 except ModuleNotFoundError:  # pragma: no cover - used after install into nnU-Net variants
     from nnunetv2.training.nnUNetTrainer.variants.wholeheart.unlabeled_pool import WholeHeartRawUnlabeledPool
+    from nnunetv2.training.nnUNetTrainer.variants.wholeheart.sdf_boundary_loss import WholeHeartSDFBoundaryLoss
 
 try:
     from torch._dynamo import OptimizedModule
@@ -166,6 +168,12 @@ class nnUNetTrainerWholeHeartAug(nnUNetTrainer):
         self.rhm_probability = _env_float("WHOLEHEART_RHM_PROB", self.default_rhm_probability)
         self.rhm_num_bins = _env_int("WHOLEHEART_RHM_BINS", 256)
         self.rhm_blend = _env_float("WHOLEHEART_RHM_BLEND", self.default_rhm_blend)
+        sdf_weight_from_env = os.environ.get("WHOLEHEART_SDF_WEIGHT")
+        self.sdf_weight = _env_float("WHOLEHEART_SDF_WEIGHT", 0.005)
+        self.sdf_enabled = _env_bool("WHOLEHEART_SDF", sdf_weight_from_env not in {None, ""})
+        if self.sdf_weight <= 0:
+            self.sdf_enabled = False
+        self.sdf_normalize = _env_bool("WHOLEHEART_SDF_NORMALIZE", True)
         self._wholeheart_config_logged = False
 
     def _modality(self) -> str:
@@ -190,9 +198,20 @@ class nnUNetTrainerWholeHeartAug(nnUNetTrainer):
             f"trainer={self.__class__.__name__}, modality={self._modality()}, "
             f"num_epochs={self.num_epochs}, "
             f"rhm_probability={self.rhm_probability}, rhm_bins={self.rhm_num_bins}, "
-            f"rhm_blend={self.rhm_blend}",
+            f"rhm_blend={self.rhm_blend}, "
+            f"sdf_enabled={self.sdf_enabled}, sdf_weight={self.sdf_weight}, "
+            f"sdf_normalize={self.sdf_normalize}",
             also_print_to_console=True,
         )
+
+    def initialize(self):
+        super().initialize()
+        if self.sdf_enabled and self.sdf_weight > 0 and not isinstance(self.loss, WholeHeartSDFBoundaryLoss):
+            self.loss = WholeHeartSDFBoundaryLoss(
+                self.loss,
+                weight=self.sdf_weight,
+                normalize=self.sdf_normalize,
+            )
 
     def on_train_start(self):
         super().on_train_start()
