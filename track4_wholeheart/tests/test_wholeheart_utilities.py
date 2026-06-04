@@ -5,7 +5,10 @@ import numpy as np
 import torch
 
 from track4_wholeheart.nnunet_extensions.unlabeled_pool import WholeHeartRawUnlabeledPool
-from track4_wholeheart.scripts.postprocess_predictions import postprocess_label_array
+from track4_wholeheart.scripts.postprocess_predictions import (
+    build_class_aware_hd_rules,
+    postprocess_label_array,
+)
 from track4_wholeheart.scripts.summarize_fold_class_metrics import (
     dice_per_label,
     metrics_from_nnunet_summary,
@@ -37,6 +40,36 @@ def test_postprocess_keeps_largest_component_and_removes_small_island():
     assert cleaned[4, 4, 4] == 0
     assert np.count_nonzero(cleaned == 1) == 8
     assert np.count_nonzero(cleaned == 2) == 8
+
+
+def test_class_aware_hd_postprocess_keeps_vessel_branches_and_removes_remote_island():
+    seg = np.zeros((32, 32, 32), dtype=np.uint8)
+    seg[4:14, 4:14, 4:14] = 1
+    seg[14:17, 8:11, 8:11] = 7
+    seg[17:20, 8:11, 8:11] = 7
+    seg[20:23, 8:11, 8:11] = 7
+    seg[28:31, 28:31, 28:31] = 7
+
+    rules = build_class_aware_hd_rules(labels=[1, 2, 3, 4, 5, 6, 7], max_distance_to_heart_mm=6)
+    cleaned = postprocess_label_array(seg, labels=[1, 2, 3, 4, 5, 6, 7], class_rules=rules)
+
+    assert np.count_nonzero(cleaned[14:17, 8:11, 8:11] == 7) == 27
+    assert np.count_nonzero(cleaned[17:20, 8:11, 8:11] == 7) == 27
+    assert np.count_nonzero(cleaned[20:23, 8:11, 8:11] == 7) == 27
+    assert np.count_nonzero(cleaned[28:31, 28:31, 28:31] == 7) == 0
+
+
+def test_class_aware_hd_postprocess_fills_chamber_holes_without_overwriting_other_labels():
+    seg = np.zeros((9, 9, 9), dtype=np.uint8)
+    seg[1:8, 1:8, 1:8] = 1
+    seg[4, 4, 4] = 0
+    seg[4, 4, 5] = 5
+
+    rules = build_class_aware_hd_rules(labels=[1, 2, 3, 4, 5, 6, 7])
+    cleaned = postprocess_label_array(seg, labels=[1, 2, 3, 4, 5, 6, 7], class_rules=rules)
+
+    assert cleaned[4, 4, 4] == 1
+    assert cleaned[4, 4, 5] == 5
 
 
 def test_dice_per_label_reports_class_level_failures():
@@ -229,3 +262,12 @@ def test_install_script_copies_unlabeled_pool_helper():
     source = Path("track4_wholeheart/scripts/install_wholeheart_trainer.py").read_text(encoding="utf-8")
 
     assert "unlabeled_pool.py" in source
+
+
+def test_predict_script_exposes_class_aware_postprocess_preset():
+    source = Path("track4_wholeheart/scripts/predict_val.sh").read_text(encoding="utf-8")
+
+    assert "POSTPROCESS_PRESET" in source
+    assert "--preset" in source
+    assert "WHOLEHEART_DISTANCE_MM" in source
+    assert "VESSEL_MIN_COMPONENT_SIZE" in source

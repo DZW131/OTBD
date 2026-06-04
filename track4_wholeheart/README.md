@@ -449,11 +449,25 @@ FOLDS="0 1 2 3 4" bash track4_wholeheart/scripts/predict_val.sh mr
 ```
 
 Enable anatomical connected-component post-processing before restoring official
-label values:
+label values. The default `legacy` preset keeps the historical rule that each
+class keeps only its largest connected component:
 
 ```bash
 POSTPROCESS=1 FOLDS="0 1 2 3 4" bash track4_wholeheart/scripts/predict_val.sh ct
 POSTPROCESS=1 FOLDS="0 1 2 3 4" bash track4_wholeheart/scripts/predict_val.sh mr
+```
+
+For submission-oriented HD reduction, use the class-aware preset. It keeps one
+main component for LV/RV/LA/RA/Myo, fills small chamber holes without overwriting
+other labels, and preserves multiple near-heart AO/PA vessel components while
+removing remote islands:
+
+```bash
+POSTPROCESS=1 POSTPROCESS_PRESET=class-aware-hd \
+  FOLDS="0 1 2 3 4" bash track4_wholeheart/scripts/predict_val.sh ct
+
+POSTPROCESS=1 POSTPROCESS_PRESET=class-aware-hd \
+  FOLDS="0 1 2 3 4" bash track4_wholeheart/scripts/predict_val.sh mr
 ```
 
 Raw nnU-Net predictions:
@@ -472,20 +486,36 @@ track4_wholeheart/outputs/mr_val_official_labels/
 
 ## Anatomical Post-Processing
 
-Apply connected-component cleanup manually before restoring official labels:
+Apply connected-component cleanup manually before restoring official labels.
+Use `--preset legacy` for the original largest-component cleanup, or
+`--preset class-aware-hd` for the HD-oriented class-aware cleanup:
 
 ```bash
 python track4_wholeheart/scripts/postprocess_predictions.py \
   --input-dir track4_wholeheart/outputs/ct_val_nnunet \
   --output-dir track4_wholeheart/outputs/ct_val_nnunet_postprocessed \
   --label-space train \
+  --preset class-aware-hd \
   --min-component-size 0
 
 python track4_wholeheart/scripts/postprocess_predictions.py \
   --input-dir track4_wholeheart/outputs/mr_val_nnunet \
   --output-dir track4_wholeheart/outputs/mr_val_nnunet_postprocessed \
   --label-space train \
+  --preset class-aware-hd \
   --min-component-size 0
+```
+
+The class-aware preset can be tuned without code changes:
+
+```bash
+python track4_wholeheart/scripts/postprocess_predictions.py \
+  --input-dir track4_wholeheart/outputs/mr_val_nnunet \
+  --output-dir track4_wholeheart/outputs/mr_val_nnunet_postprocessed \
+  --label-space train \
+  --preset class-aware-hd \
+  --wholeheart-distance-mm 25 \
+  --vessel-min-component-size 20
 ```
 
 Then restore official label values from the postprocessed directory:

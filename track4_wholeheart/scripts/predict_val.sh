@@ -6,7 +6,10 @@ CONFIGURATION="${CONFIGURATION:-3d_fullres}"
 TRAINER="${TRAINER:-nnUNetTrainer}"
 FOLDS="${FOLDS:-}"
 POSTPROCESS="${POSTPROCESS:-0}"
+POSTPROCESS_PRESET="${POSTPROCESS_PRESET:-legacy}"
 MIN_COMPONENT_SIZE="${MIN_COMPONENT_SIZE:-0}"
+WHOLEHEART_DISTANCE_MM="${WHOLEHEART_DISTANCE_MM:-25}"
+VESSEL_MIN_COMPONENT_SIZE="${VESSEL_MIN_COMPONENT_SIZE:-20}"
 
 if [[ "${MODALITY}" != "ct" && "${MODALITY}" != "mr" ]]; then
   echo "Usage: $0 {ct|mr}" >&2
@@ -53,6 +56,9 @@ if [[ "${POSTPROCESS}" == "1" ]]; then
     --input-dir "${PRED_DIR}" \
     --output-dir "${POSTPROCESSED_DIR}" \
     --label-space train \
+    --preset "${POSTPROCESS_PRESET}" \
+    --wholeheart-distance-mm "${WHOLEHEART_DISTANCE_MM}" \
+    --vessel-min-component-size "${VESSEL_MIN_COMPONENT_SIZE}" \
     --min-component-size "${MIN_COMPONENT_SIZE}"
   RESTORE_SOURCE_DIR="${POSTPROCESSED_DIR}"
   OFFICIAL_DIR="${TRACK4_ROOT}/outputs/${MODALITY}_val_official_labels_postprocessed"
