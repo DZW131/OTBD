@@ -5,6 +5,10 @@ import numpy as np
 import torch
 
 from track4_wholeheart.nnunet_extensions.unlabeled_pool import WholeHeartRawUnlabeledPool
+from track4_wholeheart.nnunet_extensions.ct_window_augmentation import (
+    apply_ct_window_rescale_torch,
+    ct_hu_window_to_normalized,
+)
 from track4_wholeheart.scripts.postprocess_predictions import (
     build_class_aware_hd_rules,
     postprocess_label_array,
@@ -70,6 +74,26 @@ def test_class_aware_hd_postprocess_fills_chamber_holes_without_overwriting_othe
 
     assert cleaned[4, 4, 4] == 1
     assert cleaned[4, 4, 5] == 5
+
+
+def test_ct_hu_window_maps_to_nnunet_normalized_space():
+    lower, upper = ct_hu_window_to_normalized(
+        lower_hu=0,
+        upper_hu=900,
+        intensity_properties={"mean": 100, "std": 50},
+    )
+
+    assert lower == -2
+    assert upper == 16
+
+
+def test_ct_window_rescale_clips_and_expands_selected_contrast_range():
+    data = torch.tensor([[[[[-2.0, -1.0, 0.0, 1.0, 2.0]]]]])
+
+    output = apply_ct_window_rescale_torch(data, lower=-1.0, upper=1.0, blend=1.0)
+
+    expected = torch.tensor([[[[[-2.0, -2.0, 0.0, 2.0, 2.0]]]]])
+    assert torch.allclose(output, expected)
 
 
 def test_dice_per_label_reports_class_level_failures():
@@ -230,6 +254,16 @@ def test_wholeheart_trainer_allows_epoch_count_env_override():
     )
 
 
+def test_wholeheart_trainer_exposes_ct_window_env_switches():
+    source = Path("track4_wholeheart/nnunet_extensions/nnUNetTrainerWholeHeartAug.py").read_text(encoding="utf-8")
+
+    assert "WHOLEHEART_CT_WINDOW_AUG" in source
+    assert "WHOLEHEART_CT_WINDOW_PROB" in source
+    assert "WHOLEHEART_CT_WINDOW_LOWER_RANGE" in source
+    assert "WHOLEHEART_CT_WINDOW_UPPER_RANGE" in source
+    assert "WHOLEHEART_CT_WINDOW_BLEND" in source
+
+
 def test_raw_unlabeled_pool_reuses_cached_patches(monkeypatch, tmp_path):
     for idx in range(3):
         (tmp_path / f"case_{idx:03d}_0000.nii.gz").touch()
@@ -262,6 +296,7 @@ def test_install_script_copies_unlabeled_pool_helper():
     source = Path("track4_wholeheart/scripts/install_wholeheart_trainer.py").read_text(encoding="utf-8")
 
     assert "unlabeled_pool.py" in source
+    assert "ct_window_augmentation.py" in source
 
 
 def test_predict_script_exposes_class_aware_postprocess_preset():

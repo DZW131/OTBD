@@ -12,6 +12,7 @@ NNUNET_ROOT = Path(nnunetv2.__path__[0])
 SOURCES = [
     TRACK4_ROOT / "nnunet_extensions" / "nnUNetTrainerWholeHeartAug.py",
     TRACK4_ROOT / "nnunet_extensions" / "unlabeled_pool.py",
+    TRACK4_ROOT / "nnunet_extensions" / "ct_window_augmentation.py",
 ]
 DESTINATION_DIR = NNUNET_ROOT / "training" / "nnUNetTrainer" / "variants" / "wholeheart"
 

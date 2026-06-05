@@ -37,8 +37,16 @@ from torch import autocast
 
 try:
     from track4_wholeheart.nnunet_extensions.unlabeled_pool import WholeHeartRawUnlabeledPool
+    from track4_wholeheart.nnunet_extensions.ct_window_augmentation import (
+        apply_ct_window_rescale_torch,
+        ct_hu_window_to_normalized,
+    )
 except ModuleNotFoundError:  # pragma: no cover - used after install into nnU-Net variants
     from nnunetv2.training.nnUNetTrainer.variants.wholeheart.unlabeled_pool import WholeHeartRawUnlabeledPool
+    from nnunetv2.training.nnUNetTrainer.variants.wholeheart.ct_window_augmentation import (
+        apply_ct_window_rescale_torch,
+        ct_hu_window_to_normalized,
+    )
 
 try:
     from torch._dynamo import OptimizedModule
@@ -58,6 +66,16 @@ def _env_int(name: str, default: int) -> int:
     if value is None or value == "":
         return default
     return int(value)
+
+
+def _env_float_pair(name: str, default: tuple[float, float]) -> tuple[float, float]:
+    value = os.environ.get(name)
+    if value is None or value == "":
+        return default
+    parts = [float(part.strip()) for part in value.split(",") if part.strip()]
+    if len(parts) != 2:
+        raise ValueError(f"{name} must be two comma-separated floats, got {value!r}")
+    return min(parts), max(parts)
 
 
 def _env_bool(name: str, default: bool) -> bool:
@@ -166,6 +184,11 @@ class nnUNetTrainerWholeHeartAug(nnUNetTrainer):
         self.rhm_probability = _env_float("WHOLEHEART_RHM_PROB", self.default_rhm_probability)
         self.rhm_num_bins = _env_int("WHOLEHEART_RHM_BINS", 256)
         self.rhm_blend = _env_float("WHOLEHEART_RHM_BLEND", self.default_rhm_blend)
+        self.ct_window_enabled = _env_bool("WHOLEHEART_CT_WINDOW_AUG", False)
+        self.ct_window_probability = _env_float("WHOLEHEART_CT_WINDOW_PROB", 0.2)
+        self.ct_window_lower_range = _env_float_pair("WHOLEHEART_CT_WINDOW_LOWER_RANGE", (-50.0, 100.0))
+        self.ct_window_upper_range = _env_float_pair("WHOLEHEART_CT_WINDOW_UPPER_RANGE", (600.0, 1200.0))
+        self.ct_window_blend = _env_float("WHOLEHEART_CT_WINDOW_BLEND", 0.7)
         self._wholeheart_config_logged = False
 
     def _modality(self) -> str:
@@ -190,7 +213,12 @@ class nnUNetTrainerWholeHeartAug(nnUNetTrainer):
             f"trainer={self.__class__.__name__}, modality={self._modality()}, "
             f"num_epochs={self.num_epochs}, "
             f"rhm_probability={self.rhm_probability}, rhm_bins={self.rhm_num_bins}, "
-            f"rhm_blend={self.rhm_blend}",
+            f"rhm_blend={self.rhm_blend}, "
+            f"ct_window_enabled={self.ct_window_enabled}, "
+            f"ct_window_probability={self.ct_window_probability}, "
+            f"ct_window_lower_range={self.ct_window_lower_range}, "
+            f"ct_window_upper_range={self.ct_window_upper_range}, "
+            f"ct_window_blend={self.ct_window_blend}",
             also_print_to_console=True,
         )
 
@@ -221,10 +249,63 @@ class nnUNetTrainerWholeHeartAug(nnUNetTrainer):
                     )
         return output
 
+    def _ct_intensity_properties(self) -> dict | None:
+        properties = getattr(self.plans_manager, "foreground_intensity_properties_per_channel", None)
+        if not isinstance(properties, dict) or not properties:
+            return None
+        channel_properties = properties.get("0", properties.get(0))
+        if channel_properties is None:
+            channel_properties = next(iter(properties.values()))
+        return channel_properties if isinstance(channel_properties, dict) else None
+
+    def _sample_range_value(self, value_range: tuple[float, float], device: torch.device) -> float:
+        lower, upper = value_range
+        if lower == upper:
+            return float(lower)
+        return float(torch.empty((), device=device).uniform_(float(lower), float(upper)).item())
+
+    def _apply_random_ct_window(self, data: torch.Tensor) -> torch.Tensor:
+        if (
+            not self.ct_window_enabled
+            or self._modality() != "ct"
+            or self.ct_window_probability <= 0
+            or data.shape[1] < 1
+        ):
+            return data
+
+        intensity_properties = self._ct_intensity_properties()
+        if intensity_properties is None:
+            return data
+
+        output = data
+        for batch_idx in range(data.shape[0]):
+            if torch.rand((), device=data.device).item() >= self.ct_window_probability:
+                continue
+
+            lower_hu = self._sample_range_value(self.ct_window_lower_range, data.device)
+            upper_hu = self._sample_range_value(self.ct_window_upper_range, data.device)
+            normalized_bounds = ct_hu_window_to_normalized(lower_hu, upper_hu, intensity_properties)
+            if normalized_bounds is None:
+                continue
+
+            if output is data:
+                output = data.clone()
+            lower, upper = normalized_bounds
+            output[batch_idx : batch_idx + 1] = apply_ct_window_rescale_torch(
+                output[batch_idx : batch_idx + 1],
+                lower=lower,
+                upper=upper,
+                blend=self.ct_window_blend,
+            )
+        return output
+
     def train_step(self, batch: dict) -> dict:
-        if self.rhm_probability > 0:
+        if self.ct_window_enabled or self.rhm_probability > 0:
             batch = dict(batch)
-            batch["data"] = self._apply_random_histogram_matching(batch["data"])
+            data = self._apply_random_ct_window(batch["data"])
+            if self.rhm_probability > 0:
+                data = self._apply_random_histogram_matching(data)
+            batch["data"] = data
         return super().train_step(batch)
 
     def _domain_intensity_transforms(self) -> list[BasicTransform]:
@@ -644,6 +725,7 @@ class nnUNetTrainerWholeHeartRHMMeanTeacher(nnUNetTrainerWholeHeartRHM):
     def train_step(self, batch: dict) -> dict:
         data = batch["data"].to(self.device, non_blocking=True)
         target = batch["target"]
+        data = self._apply_random_ct_window(data)
         data = self._apply_random_histogram_matching(data)
 
         if isinstance(target, list):

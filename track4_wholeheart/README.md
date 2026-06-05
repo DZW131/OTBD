@@ -388,6 +388,17 @@ WHOLEHEART_MT=0 TRAINER=nnUNetTrainerWholeHeartRHMMeanTeacher \
 WHOLEHEART_RHM_PROB=0.3 TRAINER=nnUNetTrainerWholeHeartRHM \
   bash track4_wholeheart/scripts/train_nnunet.sh ct 0
 
+# Enable CT-aware random window/level augmentation.
+# HU windows are mapped through nnU-Net CT foreground mean/std before applying
+# clip-rescale in normalized training space.
+WHOLEHEART_CT_WINDOW_AUG=1 \
+WHOLEHEART_CT_WINDOW_PROB=0.25 \
+WHOLEHEART_CT_WINDOW_LOWER_RANGE=-50,100 \
+WHOLEHEART_CT_WINDOW_UPPER_RANGE=600,1200 \
+WHOLEHEART_CT_WINDOW_BLEND=0.7 \
+  TRAINER=nnUNetTrainerWholeHeartRHMMeanTeacher \
+  bash track4_wholeheart/scripts/train_nnunet.sh ct 0
+
 # Tune mean-teacher schedule
 WHOLEHEART_MT_START_EPOCH=40 WHOLEHEART_MT_RAMPUP_EPOCHS=80 WHOLEHEART_MT_MAX_WEIGHT=1.0 \
   TRAINER=nnUNetTrainerWholeHeartRHMMeanTeacher \
@@ -401,6 +412,9 @@ Notes:
   the nnU-Net learning-rate schedule. Use a separate `nnUNet_results` directory
   for shortened runs so 600-epoch experiments do not resume from or overwrite
   older 1000-epoch runs.
+- CT window augmentation is disabled by default and only runs when
+  `WHOLEHEART_CT_WINDOW_AUG=1` and the current dataset modality is CT. It is
+  intended for CT domain generalization experiments, not for MR.
 - If training is interrupted, rerun the same command; nnU-Net resumes from
   `checkpoint_latest.pth` when available.
 - Fold `all` is not the same as five-fold cross-validation. Use folds `0 1 2 3 4`
