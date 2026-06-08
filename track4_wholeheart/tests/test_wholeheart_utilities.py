@@ -20,6 +20,7 @@ from track4_wholeheart.scripts.summarize_fold_class_metrics import (
     safe_mean,
     worst_class,
 )
+from track4_wholeheart.scripts.evaluate_segmentation_metrics import compute_binary_metrics
 
 
 LABEL_NAMES = {
@@ -106,6 +107,30 @@ def test_dice_per_label_reports_class_level_failures():
     assert scores[2] == 0.5
     assert scores[3] == 0.0
     assert worst_class(scores, LABEL_NAMES) == ("LA", 0.0)
+
+
+def test_segmentation_metrics_are_zero_for_identical_masks():
+    mask = np.zeros((5, 5, 5), dtype=bool)
+    mask[1:4, 1:4, 1:4] = True
+
+    metrics = compute_binary_metrics(mask, mask, spacing_xyz=(1.0, 1.0, 1.0))
+
+    assert metrics.dsc == 1.0
+    assert metrics.hd_mm == 0.0
+    assert metrics.assd_mm == 0.0
+
+
+def test_segmentation_metrics_respect_physical_spacing():
+    pred = np.zeros((5, 5, 5), dtype=bool)
+    ref = np.zeros((5, 5, 5), dtype=bool)
+    pred[2, 2, 2] = True
+    ref[3, 2, 2] = True
+
+    metrics = compute_binary_metrics(pred, ref, spacing_xyz=(1.0, 1.0, 2.0))
+
+    assert metrics.dsc == 0.0
+    assert metrics.hd_mm == 2.0
+    assert metrics.assd_mm == 2.0
 
 
 def test_metrics_from_nnunet_summary_uses_mean_dice_by_label():

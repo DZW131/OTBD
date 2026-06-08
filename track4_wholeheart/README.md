@@ -575,6 +575,28 @@ For the augmentation trainer, replace `nnUNetTrainer__...` with
 you can also pass `--pred-dir` and `--ref-dir` to compute Dice directly from
 NIfTI files.
 
+## DSC / HD / ASSD Fold Metrics
+
+Compare competition-style segmentation metrics across runs on the same internal
+validation folds. This computes per-case and per-class DSC, symmetric
+Hausdorff distance, and ASSD from NIfTI predictions and labels:
+
+```bash
+python track4_wholeheart/scripts/evaluate_segmentation_metrics.py \
+  --run baseline="$DATASET_ROOT/nnUNet_result/Dataset401_CARE2026_WholeHeart_CT/nnUNetTrainer__nnUNetPlans__3d_fullres" \
+  --run mt="$DATASET_ROOT/nnUNet_result_ct_mt200_w02_ep600/Dataset401_CARE2026_WholeHeart_CT/nnUNetTrainerWholeHeartRHMMeanTeacher__nnUNetPlans__3d_fullres" \
+  --run mt_ctwindow="$DATASET_ROOT/nnUNet_result_ct_mt200_w02_ep600_ctwindow/Dataset401_CARE2026_WholeHeart_CT/nnUNetTrainerWholeHeartRHMMeanTeacher__nnUNetPlans__3d_fullres" \
+  --folds 0 1 \
+  --gt-dir "$DATASET_ROOT/nnUNet_preprocessed/Dataset401_CARE2026_WholeHeart_CT/gt_segmentations" \
+  --case-csv track4_wholeheart/outputs/metrics/ct_fold01_case_dsc_hd_assd.csv \
+  --summary-csv track4_wholeheart/outputs/metrics/ct_fold01_summary_dsc_hd_assd.csv \
+  --summary-md track4_wholeheart/outputs/metrics/ct_fold01_summary_dsc_hd_assd.md
+```
+
+The script expects training-label predictions (`0..7`) by default. Use
+`--label-space official` only when predictions and references have already been
+restored to official label values.
+
 ## Label Mapping
 
 Training uses contiguous nnU-Net labels:
