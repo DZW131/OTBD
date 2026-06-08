@@ -20,7 +20,7 @@ from track4_wholeheart.scripts.summarize_fold_class_metrics import (
     safe_mean,
     worst_class,
 )
-from track4_wholeheart.scripts.evaluate_segmentation_metrics import compute_binary_metrics
+from track4_wholeheart.scripts.evaluate_segmentation_metrics import compute_binary_metrics, crop_to_union_foreground
 
 
 LABEL_NAMES = {
@@ -131,6 +131,25 @@ def test_segmentation_metrics_respect_physical_spacing():
     assert metrics.dsc == 0.0
     assert metrics.hd_mm == 2.0
     assert metrics.assd_mm == 2.0
+
+
+def test_segmentation_metric_crop_preserves_union_foreground_with_padding():
+    pred = np.zeros((20, 20, 20), dtype=bool)
+    ref = np.zeros((20, 20, 20), dtype=bool)
+    pred[10, 10, 10] = True
+    ref[12, 10, 10] = True
+
+    cropped_pred, cropped_ref = crop_to_union_foreground(pred, ref, padding=2)
+
+    assert cropped_pred.shape == (7, 5, 5)
+    assert cropped_ref.shape == (7, 5, 5)
+    assert cropped_pred.sum() == 1
+    assert cropped_ref.sum() == 1
+    assert compute_binary_metrics(pred, ref, spacing_xyz=(1.0, 1.0, 1.0)) == compute_binary_metrics(
+        cropped_pred,
+        cropped_ref,
+        spacing_xyz=(1.0, 1.0, 1.0),
+    )
 
 
 def test_metrics_from_nnunet_summary_uses_mean_dice_by_label():

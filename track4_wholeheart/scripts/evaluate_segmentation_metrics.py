@@ -59,7 +59,24 @@ def surface_distances_mm(pred: np.ndarray, ref: np.ndarray, spacing_xyz: Sequenc
     return np.concatenate([ref_distance[pred_surface], pred_distance[ref_surface]]).astype(np.float64)
 
 
+def crop_to_union_foreground(
+    pred: np.ndarray,
+    ref: np.ndarray,
+    padding: int = 2,
+) -> tuple[np.ndarray, np.ndarray]:
+    union = np.logical_or(pred, ref)
+    if not union.any():
+        return pred, ref
+
+    coords = np.argwhere(union)
+    lower = np.maximum(coords.min(axis=0) - int(padding), 0)
+    upper = np.minimum(coords.max(axis=0) + int(padding) + 1, pred.shape)
+    slices = tuple(slice(int(lo), int(hi)) for lo, hi in zip(lower, upper))
+    return pred[slices], ref[slices]
+
+
 def compute_binary_metrics(pred: np.ndarray, ref: np.ndarray, spacing_xyz: Sequence[float]) -> BinaryMetrics:
+    pred, ref = crop_to_union_foreground(pred, ref)
     distances = surface_distances_mm(pred, ref, spacing_xyz)
     if distances.size == 0:
         hd = 0.0
@@ -178,16 +195,17 @@ def main() -> None:
         for fold in args.folds:
             pred_dir = validation_dir(spec.root, fold)
             pred_files = sorted(pred_dir.glob("*.nii.gz"))
-            print(f"{spec.name} fold {fold}: {len(pred_files)} predictions from {pred_dir}")
+            print(f"{spec.name} fold {fold}: {len(pred_files)} predictions from {pred_dir}", flush=True)
             if not pred_files:
                 continue
 
             fold_rows: list[dict[str, object]] = []
-            for pred_path in pred_files:
+            for case_idx, pred_path in enumerate(pred_files, start=1):
                 gt_path = args.gt_dir / pred_path.name
                 if not gt_path.exists():
                     print(f"missing gt: {gt_path}")
                     continue
+                print(f"  [{case_idx}/{len(pred_files)}] {pred_path.name}", flush=True)
                 pred_img = sitk.ReadImage(str(pred_path))
                 ref_img = sitk.ReadImage(str(gt_path))
                 pred = sitk.GetArrayFromImage(pred_img)
