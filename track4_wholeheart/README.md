@@ -565,6 +565,12 @@ script prompts MedSAM2 from the existing nnU-Net masks for labels `5,6,7`
 (`Myo`, `AO`, `PA`), then only accepts candidates that stay near the original
 mask and pass conservative volume and IoU checks.
 
+The default thresholds are intentionally conservative: target candidates must
+keep volume within `0.90..1.10` of the original mask and have IoU at least
+`0.85` with the original mask. Treat this as an ablation gate; only carry the
+refined predictions into later post-processing if the raw validation metrics
+improve.
+
 Server layout used for the separate MedSAM2 environment:
 
 ```text
