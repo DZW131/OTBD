@@ -13,6 +13,12 @@ from track4_wholeheart.scripts.postprocess_predictions import (
     build_class_aware_hd_rules,
     postprocess_label_array,
 )
+from track4_wholeheart.scripts.refine_mr_with_medsam2 import (
+    central_bbox_prompt,
+    constrained_candidate,
+    normalize_volume_to_uint8,
+    should_accept_candidate,
+)
 from track4_wholeheart.scripts.summarize_fold_class_metrics import (
     dice_per_label,
     metrics_from_nnunet_summary,
@@ -350,3 +356,58 @@ def test_predict_script_exposes_class_aware_postprocess_preset():
     assert "--preset" in source
     assert "WHOLEHEART_DISTANCE_MM" in source
     assert "VESSEL_MIN_COMPONENT_SIZE" in source
+
+
+def test_medsam2_prompt_uses_largest_slice_bbox_with_padding():
+    mask = np.zeros((4, 10, 12), dtype=bool)
+    mask[1, 3:5, 4:6] = True
+    mask[2, 2:7, 3:9] = True
+
+    key_slice, bbox = central_bbox_prompt(mask, padding=2)
+
+    assert key_slice == 2
+    assert bbox.tolist() == [1.0, 0.0, 10.0, 8.0]
+
+
+def test_medsam2_candidate_is_constrained_near_original_and_empty_regions():
+    original = np.zeros((1, 7, 7), dtype=bool)
+    original[0, 3, 3] = True
+    medsam = np.zeros_like(original)
+    medsam[0, 2:5, 2:5] = True
+    medsam[0, 0, 0] = True
+    current_seg = np.zeros((1, 7, 7), dtype=np.uint8)
+    current_seg[0, 2, 2] = 4
+
+    candidate = constrained_candidate(
+        medsam_mask=medsam,
+        original_mask=original,
+        current_seg=current_seg,
+        label=5,
+        dilation_radius=1,
+    )
+
+    assert candidate[0, 3, 3]
+    assert not candidate[0, 0, 0]
+    assert not candidate[0, 2, 2]
+
+
+def test_medsam2_acceptance_rejects_unstable_volume_or_overlap():
+    original = np.zeros((1, 6, 6), dtype=bool)
+    original[0, 2:4, 2:4] = True
+    same = original.copy()
+    too_large = np.zeros_like(original)
+    too_large[0, 1:5, 1:5] = True
+    shifted = np.zeros_like(original)
+    shifted[0, 0:2, 0:2] = True
+
+    assert should_accept_candidate(original, same, 0.8, 1.2, 0.5)[0]
+    assert should_accept_candidate(original, too_large, 0.8, 1.2, 0.5)[:2] == (False, "too_large")
+    assert should_accept_candidate(original, shifted, 0.8, 1.2, 0.5)[:2] == (False, "low_iou")
+
+
+def test_medsam2_normalization_uses_nonzero_foreground_when_available():
+    image = np.array([0.0, 10.0, 20.0, 30.0], dtype=np.float32).reshape(1, 2, 2)
+
+    normalized = normalize_volume_to_uint8(image, lower_percentile=0, upper_percentile=100)
+
+    assert normalized.tolist() == [[[0, 0], [128, 255]]]

@@ -28,6 +28,7 @@ track4_wholeheart/
   scripts/plan_preprocess.sh
   scripts/train_nnunet.sh
   scripts/predict_val.sh
+  scripts/refine_mr_with_medsam2.py
   nnunet_extensions/nnUNetTrainerWholeHeartAug.py
   setup_conda_env.sh
   DATASET/                  # generated, ignored by git
@@ -548,6 +549,94 @@ python track4_wholeheart/scripts/restore_label_values.py \
 
 If predictions have already been restored to official labels, run
 `postprocess_predictions.py` with `--label-space official`.
+
+## MR MedSAM2 Refinement
+
+Use this only as a development-time refinement between raw MR nnU-Net prediction
+and anatomical post-processing. The intended first comparison is therefore:
+
+```text
+raw nnU-Net validation predictions
+raw nnU-Net validation predictions refined by MedSAM2 for Myo/AO/PA only
+```
+
+This keeps the known post-processing gain out of the ablation. The refinement
+script prompts MedSAM2 from the existing nnU-Net masks for labels `5,6,7`
+(`Myo`, `AO`, `PA`), then only accepts candidates that stay near the original
+mask and pass conservative volume and IoU checks.
+
+Server layout used for the separate MedSAM2 environment:
+
+```text
+/home/data/jingkun/duyanhong/workspace/OTBD/
+  third_party/MedSAM2/
+  pretrained/MedSAM2/MedSAM2_latest.pt
+  .conda_envs/medsam2refine/
+```
+
+Run a one-case smoke test first:
+
+```bash
+cd /home/data/jingkun/duyanhong/workspace/OTBD
+
+DATASET_ROOT="$PWD/track4_wholeheart/DATASET"
+BASE_ROOT="$DATASET_ROOT/nnUNet_result/Dataset402_CARE2026_WholeHeart_MR/nnUNetTrainer__nnUNetPlans__3d_fullres"
+IMG_DIR="$DATASET_ROOT/nnUNet_raw/Dataset402_CARE2026_WholeHeart_MR/imagesTr"
+SAM2_ROOT="$PWD/track4_wholeheart/outputs/internal_val/mr_nnunet_medsam2_raw"
+
+CUDA_VISIBLE_DEVICES=0 .conda_envs/medsam2refine/bin/python \
+  track4_wholeheart/scripts/refine_mr_with_medsam2.py \
+  --pred-root "$BASE_ROOT" \
+  --output-root "$SAM2_ROOT" \
+  --folds 0 \
+  --image-dir "$IMG_DIR" \
+  --checkpoint pretrained/MedSAM2/MedSAM2_latest.pt \
+  --medsam2-root third_party/MedSAM2 \
+  --max-cases 1 \
+  --decisions-csv track4_wholeheart/outputs/metrics/mr_medsam2_refine_decisions_smoke.csv
+```
+
+If the smoke test writes a NIfTI file and decisions CSV, run the full target
+fold comparison without post-processing:
+
+```bash
+CUDA_VISIBLE_DEVICES=0 .conda_envs/medsam2refine/bin/python \
+  track4_wholeheart/scripts/refine_mr_with_medsam2.py \
+  --pred-root "$BASE_ROOT" \
+  --output-root "$SAM2_ROOT" \
+  --folds 0 \
+  --image-dir "$IMG_DIR" \
+  --checkpoint pretrained/MedSAM2/MedSAM2_latest.pt \
+  --medsam2-root third_party/MedSAM2 \
+  --decisions-csv track4_wholeheart/outputs/metrics/mr_medsam2_refine_decisions_fold0.csv
+```
+
+Then evaluate raw nnU-Net against raw nnU-Net + MedSAM2:
+
+```bash
+GT_DIR="$DATASET_ROOT/nnUNet_preprocessed/Dataset402_CARE2026_WholeHeart_MR/gt_segmentations"
+
+/home/jingkun/miniconda3/envs/track4_wholeheart/bin/python \
+  track4_wholeheart/scripts/evaluate_segmentation_metrics.py \
+  --run nnunet="$BASE_ROOT" \
+  --run nnunet_medsam2="$SAM2_ROOT" \
+  --folds 0 \
+  --gt-dir "$GT_DIR" \
+  --case-csv track4_wholeheart/outputs/metrics/mr_nnunet_vs_medsam2_fold0_case.csv \
+  --summary-csv track4_wholeheart/outputs/metrics/mr_nnunet_vs_medsam2_fold0_summary.csv \
+  --summary-md track4_wholeheart/outputs/metrics/mr_nnunet_vs_medsam2_fold0_summary.md
+```
+
+Print only the three target classes:
+
+```bash
+/home/jingkun/miniconda3/envs/track4_wholeheart/bin/python - <<'PY'
+import pandas as pd
+
+summary = pd.read_csv("track4_wholeheart/outputs/metrics/mr_nnunet_vs_medsam2_fold0_summary.csv")
+print(summary[summary["class"].isin(["Myo", "AO", "PA"])].to_string(index=False))
+PY
+```
 
 ## Per-Class Fold Metrics
 
