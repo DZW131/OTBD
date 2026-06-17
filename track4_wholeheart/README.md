@@ -485,6 +485,65 @@ POSTPROCESS=1 POSTPROCESS_PRESET=class-aware-hd \
   FOLDS="0 1 2 3 4" bash track4_wholeheart/scripts/predict_val.sh mr
 ```
 
+`predict_val.sh` prints the active modality, trainer, folds, TTA status,
+probability saving, post-processing preset, expected preset, and sanity-check
+setting before inference. The current submission-oriented defaults are:
+
+```text
+CT: POSTPROCESS=1 POSTPROCESS_PRESET=legacy
+MR: POSTPROCESS=1 POSTPROCESS_PRESET=class-aware-hd
+```
+
+The script warns, without aborting, when inference is not using `FOLDS="0 1 2 3 4"`,
+when post-processing is disabled, or when a modality uses a preset different
+from the current best-known CT/MR setting. These warnings are intended to catch
+submission mix-ups while still allowing raw ablations.
+
+CT AO/PA softmax patch experiments can be enabled after the CT legacy
+post-processing step. This is intentionally CT-only and the script aborts if
+`CT_AOPA_SOFT=1` is used without `POSTPROCESS=1 POSTPROCESS_PRESET=legacy`.
+The raw nnU-Net `.npz` probabilities are read from the prediction directory;
+their spatial shape must match the legacy prediction shape exactly.
+
+```bash
+# CT-0: current rollback baseline
+SANITY_CHECK=1 POSTPROCESS=1 POSTPROCESS_PRESET=legacy \
+  FOLDS="0 1 2 3 4" bash track4_wholeheart/scripts/predict_val.sh ct
+
+# CT-1: fixed-threshold AO/PA hysteresis, no closing
+SANITY_CHECK=1 POSTPROCESS=1 POSTPROCESS_PRESET=legacy \
+  CT_AOPA_SOFT=1 CT_AOPA_THRESHOLD_MODE=fixed CT_AOPA_P_CLASS_THRESHOLD=0.25 \
+  CT_AOPA_COMPONENT_SCORE=0 CT_AOPA_ENABLE_CLOSING=0 \
+  FOLDS="0 1 2 3 4" bash track4_wholeheart/scripts/predict_val.sh ct
+
+# CT-2: seed-adaptive AO/PA hysteresis, no closing
+SANITY_CHECK=1 POSTPROCESS=1 POSTPROCESS_PRESET=legacy \
+  CT_AOPA_SOFT=1 CT_AOPA_THRESHOLD_MODE=adaptive \
+  CT_AOPA_COMPONENT_SCORE=0 CT_AOPA_ENABLE_CLOSING=0 \
+  FOLDS="0 1 2 3 4" bash track4_wholeheart/scripts/predict_val.sh ct
+
+# CT-3: CT-2 plus component-score cleanup
+SANITY_CHECK=1 POSTPROCESS=1 POSTPROCESS_PRESET=legacy \
+  CT_AOPA_SOFT=1 CT_AOPA_THRESHOLD_MODE=adaptive CT_AOPA_COMPONENT_SCORE=1 \
+  CT_AOPA_MIN_MEAN_PROB=0.35 CT_AOPA_MIN_P10_PROB=0.15 \
+  CT_AOPA_ENABLE_CLOSING=0 \
+  FOLDS="0 1 2 3 4" bash track4_wholeheart/scripts/predict_val.sh ct
+
+# CT-4: CT-3 plus light AO/PA radius=1 closing
+SANITY_CHECK=1 POSTPROCESS=1 POSTPROCESS_PRESET=legacy \
+  CT_AOPA_SOFT=1 CT_AOPA_THRESHOLD_MODE=adaptive CT_AOPA_COMPONENT_SCORE=1 \
+  CT_AOPA_ENABLE_CLOSING=1 CT_AOPA_CLOSING_RADIUS_VOXEL=1 \
+  FOLDS="0 1 2 3 4" bash track4_wholeheart/scripts/predict_val.sh ct
+```
+
+`CT_AOPA_THRESHOLD_MODE=adaptive` computes each case/class threshold from the
+legacy seed probability as `max(0.18, min(0.30, 0.45 * seed_median_prob))`.
+The patch only writes AO/PA into background or same-class voxels by default,
+blocks high-confidence competing classes, and restricts growth to the seed
+bbox/distance neighborhood. The refined train-label output is written to
+`track4_wholeheart/outputs/ct_val_nnunet_postprocessed_aopa_soft/`, then restored
+to `track4_wholeheart/outputs/ct_val_official_labels_postprocessed_aopa_soft/`.
+
 Raw nnU-Net predictions:
 
 ```text
@@ -533,6 +592,17 @@ python track4_wholeheart/scripts/postprocess_predictions.py \
   --vessel-min-component-size 20
 ```
 
+To run the CT AO/PA soft patch manually after CT legacy post-processing:
+
+```bash
+python track4_wholeheart/scripts/postprocess_ct_aopa_soft.py \
+  --input-dir track4_wholeheart/outputs/ct_val_nnunet_postprocessed \
+  --probability-dir track4_wholeheart/outputs/ct_val_nnunet \
+  --output-dir track4_wholeheart/outputs/ct_val_nnunet_postprocessed_aopa_soft \
+  --threshold-mode adaptive \
+  --component-score
+```
+
 Then restore official label values from the postprocessed directory:
 
 ```bash
@@ -549,6 +619,28 @@ python track4_wholeheart/scripts/restore_label_values.py \
 
 If predictions have already been restored to official labels, run
 `postprocess_predictions.py` with `--label-space official`.
+
+## Prediction Sanity Check
+
+Enable the submission sanity check during validation prediction by setting
+`SANITY_CHECK=1`. This runs after official label restoration and checks image
+geometry, allowed official label values, empty predictions, missing classes,
+unexpected files, and missing outputs:
+
+```bash
+SANITY_CHECK=1 POSTPROCESS=1 POSTPROCESS_PRESET=class-aware-hd \
+  FOLDS="0 1 2 3 4" bash track4_wholeheart/scripts/predict_val.sh mr
+```
+
+To check an existing restored official-label output directory manually:
+
+```bash
+python track4_wholeheart/scripts/check_prediction_sanity.py \
+  --input-dir track4_wholeheart/DATASET/nnUNet_raw/Dataset402_CARE2026_WholeHeart_MR/imagesTs \
+  --pred-dir track4_wholeheart/outputs/mr_val_official_labels_postprocessed \
+  --mapping-json track4_wholeheart/DATASET/nnUNet_raw/Dataset402_CARE2026_WholeHeart_MR/conversion_mapping.json \
+  --label-space official
+```
 
 ## MR MedSAM2 Refinement
 

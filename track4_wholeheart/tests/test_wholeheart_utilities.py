@@ -27,6 +27,16 @@ from track4_wholeheart.scripts.summarize_fold_class_metrics import (
     worst_class,
 )
 from track4_wholeheart.scripts.evaluate_segmentation_metrics import compute_binary_metrics, crop_to_union_foreground
+from track4_wholeheart.scripts.check_prediction_sanity import (
+    GeometrySignature,
+    compare_geometry,
+    check_array_labels,
+)
+from track4_wholeheart.scripts.postprocess_ct_aopa_soft import (
+    adaptive_seed_threshold,
+    component_score_cleanup,
+    vessel_hysteresis_growing,
+)
 
 
 LABEL_NAMES = {
@@ -101,6 +111,144 @@ def test_ct_window_rescale_clips_and_expands_selected_contrast_range():
 
     expected = torch.tensor([[[[[-2.0, -2.0, 0.0, 2.0, 2.0]]]]])
     assert torch.allclose(output, expected)
+
+
+def test_prediction_sanity_accepts_valid_official_labels():
+    pred = np.array([0, 500, 600, 420, 550, 205, 820, 850], dtype=np.uint16)
+
+    issues = check_array_labels(
+        pred,
+        allowed_labels={0, 500, 600, 420, 550, 205, 820, 850},
+        required_labels={500, 600, 420, 550, 205, 820, 850},
+        path="Case001_label.nii.gz",
+    )
+
+    assert issues == []
+
+
+def test_prediction_sanity_reports_unexpected_label_values():
+    pred = np.array([0, 500, 999], dtype=np.uint16)
+
+    issues = check_array_labels(
+        pred,
+        allowed_labels={0, 500, 600, 420, 550, 205, 820, 850},
+        required_labels=set(),
+        path="Case001_label.nii.gz",
+    )
+
+    assert [issue.code for issue in issues] == ["unexpected_label"]
+    assert "999" in issues[0].message
+
+
+def test_prediction_sanity_reports_geometry_mismatches():
+    input_geometry = GeometrySignature(
+        size=(8, 7, 6),
+        spacing=(1.0, 1.0, 2.0),
+        origin=(0.0, 0.0, 0.0),
+        direction=(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0),
+    )
+    pred_geometry = GeometrySignature(
+        size=(8, 7, 5),
+        spacing=(1.0, 1.0, 2.5),
+        origin=(0.0, 0.0, 0.0),
+        direction=(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0),
+    )
+
+    issues = compare_geometry(input_geometry, pred_geometry, path="Case001_label.nii.gz")
+
+    assert [issue.code for issue in issues] == ["shape_mismatch", "spacing_mismatch"]
+
+
+def test_ct_aopa_adaptive_threshold_clamps_from_seed_median_prob():
+    class_prob = np.array([0.20, 0.60, 0.90], dtype=np.float32)
+
+    assert adaptive_seed_threshold(class_prob, np.array([False, True, False])) == 0.27
+    assert adaptive_seed_threshold(np.array([0.95, 0.90], dtype=np.float32), np.array([True, True])) == 0.30
+    assert adaptive_seed_threshold(np.array([0.30, 0.40], dtype=np.float32), np.array([True, True])) == 0.18
+
+
+def test_ct_aopa_hysteresis_grows_seed_connected_vessel_without_remote_or_high_conf_other():
+    pred = np.zeros((9, 9, 9), dtype=np.uint8)
+    pred[3:5, 3:5, 3:5] = 6
+    prob = np.zeros((8, 9, 9, 9), dtype=np.float32)
+    prob[6, pred == 6] = 0.80
+    prob[6, 5, 4, 4] = 0.26
+    prob[6, 6, 4, 4] = 0.27
+    prob[6, 0, 0, 0] = 0.90
+    prob[6, 4, 5, 4] = 0.90
+    prob[1, 4, 5, 4] = 0.70
+
+    refined, stats = vessel_hysteresis_growing(
+        pred,
+        prob,
+        class_idx=6,
+        spacing=(1.0, 1.0, 1.0),
+        p_class_threshold=0.25,
+        threshold_mode="fixed",
+        bbox_margin_mm=5,
+        max_distance_mm=5,
+    )
+
+    assert stats.threshold == 0.25
+    assert refined[5, 4, 4] == 6
+    assert refined[6, 4, 4] == 6
+    assert refined[0, 0, 0] == 0
+    assert refined[4, 5, 4] == 0
+
+
+def test_ct_aopa_adaptive_hysteresis_recovers_low_confidence_connected_gap():
+    pred = np.zeros((7, 7, 7), dtype=np.uint8)
+    pred[2:4, 2:4, 2:4] = 7
+    prob = np.zeros((8, 7, 7, 7), dtype=np.float32)
+    prob[7, pred == 7] = 0.40
+    prob[7, 4, 3, 3] = 0.20
+
+    fixed, _ = vessel_hysteresis_growing(
+        pred,
+        prob,
+        class_idx=7,
+        spacing=(1.0, 1.0, 1.0),
+        p_class_threshold=0.25,
+        threshold_mode="fixed",
+    )
+    adaptive, stats = vessel_hysteresis_growing(
+        pred,
+        prob,
+        class_idx=7,
+        spacing=(1.0, 1.0, 1.0),
+        threshold_mode="adaptive",
+    )
+
+    assert fixed[4, 3, 3] == 0
+    assert stats.threshold == 0.18
+    assert adaptive[4, 3, 3] == 7
+
+
+def test_ct_aopa_component_score_cleanup_removes_independent_low_confidence_component():
+    pred = np.zeros((9, 9, 9), dtype=np.uint8)
+    pred[2:4, 2:4, 2:4] = 6
+    pred[6:8, 6:8, 6:8] = 6
+    prob = np.zeros((8, 9, 9, 9), dtype=np.float32)
+    prob[0] = 0.05
+    prob[6, 2:4, 2:4, 2:4] = 0.85
+    prob[6, 6:8, 6:8, 6:8] = 0.10
+    seed = pred == 6
+    seed[6:8, 6:8, 6:8] = False
+
+    cleaned, stats = component_score_cleanup(
+        pred,
+        prob,
+        class_idx=6,
+        spacing=(1.0, 1.0, 1.0),
+        seed_mask=seed,
+        min_voxels=2,
+        min_mean_prob=0.35,
+        min_p10_prob=0.15,
+    )
+
+    assert stats.components_removed == 1
+    assert np.count_nonzero(cleaned[2:4, 2:4, 2:4] == 6) == 8
+    assert np.count_nonzero(cleaned[6:8, 6:8, 6:8] == 6) == 0
 
 
 def test_dice_per_label_reports_class_level_failures():
@@ -312,6 +460,36 @@ def test_wholeheart_trainer_exposes_ct_window_env_switches():
     assert "WHOLEHEART_CT_WINDOW_LOWER_RANGE" in source
     assert "WHOLEHEART_CT_WINDOW_UPPER_RANGE" in source
     assert "WHOLEHEART_CT_WINDOW_BLEND" in source
+
+
+def test_predict_val_exposes_optional_sanity_check():
+    source = Path("track4_wholeheart/scripts/predict_val.sh").read_text(encoding="utf-8")
+
+    assert "SANITY_CHECK" in source
+    assert "check_prediction_sanity.py" in source
+    assert "--label-space official" in source
+
+
+def test_predict_val_logs_submission_safeguards():
+    source = Path("track4_wholeheart/scripts/predict_val.sh").read_text(encoding="utf-8")
+
+    assert "expected_postprocess_preset=" in source
+    assert "save_probabilities=enabled" in source
+    assert "WARNING: ${MODALITY^^} prediction is not using full 5-fold ensemble" in source
+    assert "WARNING: ${MODALITY^^} current best postprocess preset is" in source
+    assert "CT current best postprocess preset is legacy" in source
+    assert "MR current best postprocess preset is class-aware-hd" in source
+
+
+def test_predict_val_exposes_ct_aopa_soft_patch_controls():
+    source = Path("track4_wholeheart/scripts/predict_val.sh").read_text(encoding="utf-8")
+
+    assert "CT_AOPA_SOFT" in source
+    assert "postprocess_ct_aopa_soft.py" in source
+    assert "--threshold-mode" in source
+    assert "CT_AOPA_COMPONENT_SCORE" in source
+    assert "CT_AOPA_ENABLE_CLOSING" in source
+    assert "CT AOPA soft patch requires POSTPROCESS=1 and POSTPROCESS_PRESET=legacy" in source
 
 
 def test_raw_unlabeled_pool_reuses_cached_patches(monkeypatch, tmp_path):
