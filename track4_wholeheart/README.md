@@ -784,6 +784,36 @@ The script expects training-label predictions (`0..7`) by default. Use
 `--label-space official` only when predictions and references have already been
 restored to official label values.
 
+Always compare new CT/MR experiments against the current submission baseline
+before deciding whether they are useful:
+
+```text
+CT baseline run name: ct-baseline-legacy
+MR baseline run name: mr-baseline-class-aware-hd
+```
+
+After `evaluate_segmentation_metrics.py` writes a summary CSV containing the
+baseline and candidate runs, generate a class-wise delta table:
+
+```bash
+python track4_wholeheart/scripts/compare_metric_summaries.py \
+  --summary-csv track4_wholeheart/outputs/metrics/ct_experiment_summary_dsc_hd_assd.csv \
+  --baseline-run ct-baseline-legacy \
+  --output-csv track4_wholeheart/outputs/metrics/ct_experiment_vs_baseline.csv \
+  --output-md track4_wholeheart/outputs/metrics/ct_experiment_vs_baseline.md \
+  --include-folds
+
+python track4_wholeheart/scripts/compare_metric_summaries.py \
+  --summary-csv track4_wholeheart/outputs/metrics/mr_experiment_summary_dsc_hd_assd.csv \
+  --baseline-run mr-baseline-class-aware-hd \
+  --output-csv track4_wholeheart/outputs/metrics/mr_experiment_vs_baseline.csv \
+  --output-md track4_wholeheart/outputs/metrics/mr_experiment_vs_baseline.md \
+  --include-folds
+```
+
+The comparison output keeps one row per class (`LV/RV/LA/RA/Myo/AO/PA`) and
+reports the experiment metric, baseline metric, and delta for DSC, HD, and ASSD.
+
 ## Label Mapping
 
 Training uses contiguous nnU-Net labels:

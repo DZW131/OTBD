@@ -37,6 +37,7 @@ from track4_wholeheart.scripts.postprocess_ct_aopa_soft import (
     component_score_cleanup,
     vessel_hysteresis_growing,
 )
+from track4_wholeheart.scripts.compare_metric_summaries import compare_summary_rows
 
 
 LABEL_NAMES = {
@@ -157,6 +158,40 @@ def test_prediction_sanity_reports_geometry_mismatches():
     issues = compare_geometry(input_geometry, pred_geometry, path="Case001_label.nii.gz")
 
     assert [issue.code for issue in issues] == ["shape_mismatch", "spacing_mismatch"]
+
+
+def test_compare_metric_summaries_reports_experiment_delta_against_baseline():
+    rows = [
+        {"run": "ct-baseline-legacy", "fold": "0", "class": "AO", "n_cases": "2", "dsc": "0.90", "hd_mm": "8.0", "assd_mm": "1.2"},
+        {"run": "ct-aopa-adaptive", "fold": "0", "class": "AO", "n_cases": "2", "dsc": "0.91", "hd_mm": "7.5", "assd_mm": "1.1"},
+    ]
+
+    compared = compare_summary_rows(rows, baseline_run="ct-baseline-legacy", include_folds=True)
+
+    assert compared[0]["run"] == "ct-aopa-adaptive"
+    assert compared[0]["fold"] == "0"
+    assert compared[0]["class"] == "AO"
+    assert compared[0]["dsc_delta"] == 0.01
+    assert compared[0]["hd_mm_delta"] == -0.5
+    assert compared[0]["assd_mm_delta"] == -0.1
+
+
+def test_compare_metric_summaries_adds_mean_rows_across_folds():
+    rows = [
+        {"run": "mr-baseline-class-aware-hd", "fold": "0", "class": "PA", "n_cases": "2", "dsc": "0.80", "hd_mm": "9.0", "assd_mm": "1.5"},
+        {"run": "mr-baseline-class-aware-hd", "fold": "1", "class": "PA", "n_cases": "2", "dsc": "0.82", "hd_mm": "7.0", "assd_mm": "1.1"},
+        {"run": "mr-ens-final-best-07-03", "fold": "0", "class": "PA", "n_cases": "2", "dsc": "0.81", "hd_mm": "8.0", "assd_mm": "1.4"},
+        {"run": "mr-ens-final-best-07-03", "fold": "1", "class": "PA", "n_cases": "2", "dsc": "0.83", "hd_mm": "6.0", "assd_mm": "1.0"},
+    ]
+
+    compared = compare_summary_rows(rows, baseline_run="mr-baseline-class-aware-hd")
+
+    assert len(compared) == 1
+    assert compared[0]["fold"] == "mean"
+    assert compared[0]["dsc"] == 0.82
+    assert compared[0]["baseline_dsc"] == 0.81
+    assert compared[0]["dsc_delta"] == 0.01
+    assert compared[0]["hd_mm_delta"] == -1.0
 
 
 def test_ct_aopa_adaptive_threshold_clamps_from_seed_median_prob():
