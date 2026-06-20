@@ -38,6 +38,10 @@ from track4_wholeheart.scripts.postprocess_ct_aopa_soft import (
     vessel_hysteresis_growing,
 )
 from track4_wholeheart.scripts.compare_metric_summaries import compare_summary_rows
+from track4_wholeheart.scripts.ensemble_probabilities import (
+    argmax_segmentation,
+    weighted_average_probabilities,
+)
 
 
 LABEL_NAMES = {
@@ -192,6 +196,21 @@ def test_compare_metric_summaries_adds_mean_rows_across_folds():
     assert compared[0]["baseline_dsc"] == 0.81
     assert compared[0]["dsc_delta"] == 0.01
     assert compared[0]["hd_mm_delta"] == -1.0
+
+
+def test_weighted_probability_ensemble_renormalizes_and_uses_argmax():
+    prob_a = np.zeros((3, 2, 1, 1), dtype=np.float32)
+    prob_b = np.zeros((3, 2, 1, 1), dtype=np.float32)
+    prob_a[:, 0, 0, 0] = [0.1, 0.8, 0.1]
+    prob_b[:, 0, 0, 0] = [0.1, 0.2, 0.7]
+    prob_a[:, 1, 0, 0] = [0.2, 0.3, 0.5]
+    prob_b[:, 1, 0, 0] = [0.2, 0.7, 0.1]
+
+    ensembled = weighted_average_probabilities([prob_a, prob_b], weights=[0.75, 0.25])
+    seg = argmax_segmentation(ensembled)
+
+    assert np.allclose(ensembled.sum(axis=0), 1.0)
+    assert seg.tolist() == [[[1]], [[1]]]
 
 
 def test_ct_aopa_adaptive_threshold_clamps_from_seed_median_prob():
