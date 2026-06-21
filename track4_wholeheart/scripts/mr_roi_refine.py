@@ -367,10 +367,12 @@ def paste_refinement(args: argparse.Namespace) -> None:
         refined = base.copy()
         slices = tuple(slice(int(lo), int(hi)) for lo, hi in zip(lower, upper))
         patch = refined[slices].copy()
-        patch[patch == int(args.target_label)] = 0
+        original_patch = patch.copy()
+        if args.merge_mode == "replace":
+            patch[patch == int(args.target_label)] = 0
         roi_mask = roi == int(args.roi_label)
         if protect_labels:
-            protected = np.isin(patch, list(protect_labels))
+            protected = np.isin(original_patch, list(protect_labels))
             roi_mask = roi_mask & ~protected
         patch[roi_mask] = int(args.target_label)
         refined[slices] = patch
@@ -429,6 +431,12 @@ def parse_args() -> argparse.Namespace:
     paste.add_argument("--target-label", type=int, default=6)
     paste.add_argument("--roi-label", type=int, default=1)
     paste.add_argument("--protect-labels", default="1,2,3,4,5,7")
+    paste.add_argument(
+        "--merge-mode",
+        choices=["replace", "add-only"],
+        default="replace",
+        help="replace clears the target class inside the crop before pasting; add-only preserves baseline target voxels and only adds ROI positives.",
+    )
     paste.add_argument("--postprocess", choices=["none", "class-aware-hd"], default="class-aware-hd")
     paste.set_defaults(func=paste_refinement)
 
