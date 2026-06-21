@@ -365,6 +365,25 @@ def load_probability_mask(prob_path: Path, roi_label: int, threshold: float, exp
     return prob[int(roi_label)] >= float(threshold)
 
 
+def restrict_mask_to_target_distance(
+    roi_mask: np.ndarray,
+    reference_patch: np.ndarray,
+    target_label: int,
+    spacing_zyx: Iterable[float],
+    max_distance_mm: float | None,
+) -> np.ndarray:
+    if max_distance_mm is None:
+        return roi_mask
+    target_mask = reference_patch == int(target_label)
+    if not np.any(target_mask):
+        return np.zeros_like(roi_mask, dtype=bool)
+
+    from scipy.ndimage import distance_transform_edt
+
+    distance = distance_transform_edt(~target_mask, sampling=tuple(float(v) for v in spacing_zyx))
+    return roi_mask & (distance <= float(max_distance_mm))
+
+
 def paste_refinement(args: argparse.Namespace) -> None:
     sitk = load_sitk()
     args.output_dir.mkdir(parents=True, exist_ok=True)
@@ -404,6 +423,13 @@ def paste_refinement(args: argparse.Namespace) -> None:
             roi_mask = load_probability_mask(prob_path, args.roi_label, args.prob_threshold, expected_shape)
         else:
             roi_mask = roi == int(args.roi_label)
+        roi_mask = restrict_mask_to_target_distance(
+            roi_mask,
+            original_patch,
+            args.target_label,
+            tuple(reversed(base_img.GetSpacing())),
+            args.max_add_distance_mm,
+        )
         if protect_labels:
             protected = np.isin(original_patch, list(protect_labels))
             roi_mask = roi_mask & ~protected
@@ -465,6 +491,7 @@ def parse_args() -> argparse.Namespace:
     paste.add_argument("--roi-label", type=int, default=1)
     paste.add_argument("--roi-prob-dir", type=Path, default=None, help="Optional nnU-Net ROI .npz probability directory for thresholded pasting.")
     paste.add_argument("--prob-threshold", type=float, default=0.5, help="Probability threshold used when --roi-prob-dir is provided.")
+    paste.add_argument("--max-add-distance-mm", type=float, default=None, help="Optional physical-distance gate from the baseline target mask for conservative local additions.")
     paste.add_argument("--protect-labels", default="1,2,3,4,5,7")
     paste.add_argument(
         "--merge-mode",
