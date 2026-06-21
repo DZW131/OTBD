@@ -338,6 +338,33 @@ def load_metadata(path: Path) -> dict[str, CropRecord]:
     return records
 
 
+def load_probability_mask(prob_path: Path, roi_label: int, threshold: float, expected_shape: tuple[int, ...]) -> np.ndarray:
+    data = np.load(prob_path)
+    try:
+        if isinstance(data, np.lib.npyio.NpzFile):
+            if "probabilities" in data:
+                prob = data["probabilities"]
+            elif "softmax" in data:
+                prob = data["softmax"]
+            elif len(data.files) == 1:
+                prob = data[data.files[0]]
+            else:
+                raise KeyError(f"Could not infer probability array key in {prob_path}; keys={data.files}")
+        else:
+            prob = data
+    finally:
+        if isinstance(data, np.lib.npyio.NpzFile):
+            data.close()
+
+    if prob.ndim != len(expected_shape) + 1:
+        raise ValueError(f"Expected probability shape [C, *shape] for {prob_path}, got {prob.shape}")
+    if tuple(int(v) for v in prob.shape[1:]) != expected_shape:
+        raise ValueError(f"Probability shape mismatch for {prob_path}: prob={prob.shape[1:]}, expected={expected_shape}")
+    if int(roi_label) < 0 or int(roi_label) >= prob.shape[0]:
+        raise ValueError(f"roi_label {roi_label} is outside probability channels for {prob_path}: {prob.shape}")
+    return prob[int(roi_label)] >= float(threshold)
+
+
 def paste_refinement(args: argparse.Namespace) -> None:
     sitk = load_sitk()
     args.output_dir.mkdir(parents=True, exist_ok=True)
@@ -370,7 +397,13 @@ def paste_refinement(args: argparse.Namespace) -> None:
         original_patch = patch.copy()
         if args.merge_mode == "replace":
             patch[patch == int(args.target_label)] = 0
-        roi_mask = roi == int(args.roi_label)
+        if args.roi_prob_dir is not None:
+            prob_path = args.roi_prob_dir / f"{case_id}.npz"
+            if not prob_path.exists():
+                raise FileNotFoundError(f"Missing ROI probability for {case_id}: {prob_path}")
+            roi_mask = load_probability_mask(prob_path, args.roi_label, args.prob_threshold, expected_shape)
+        else:
+            roi_mask = roi == int(args.roi_label)
         if protect_labels:
             protected = np.isin(original_patch, list(protect_labels))
             roi_mask = roi_mask & ~protected
@@ -430,6 +463,8 @@ def parse_args() -> argparse.Namespace:
     paste.add_argument("--output-dir", type=Path, required=True)
     paste.add_argument("--target-label", type=int, default=6)
     paste.add_argument("--roi-label", type=int, default=1)
+    paste.add_argument("--roi-prob-dir", type=Path, default=None, help="Optional nnU-Net ROI .npz probability directory for thresholded pasting.")
+    paste.add_argument("--prob-threshold", type=float, default=0.5, help="Probability threshold used when --roi-prob-dir is provided.")
     paste.add_argument("--protect-labels", default="1,2,3,4,5,7")
     paste.add_argument(
         "--merge-mode",
