@@ -546,6 +546,27 @@ def test_predict_val_exposes_ct_aopa_soft_patch_controls():
     assert "CT AOPA soft patch requires POSTPROCESS=1 and POSTPROCESS_PRESET=legacy" in source
 
 
+def test_mr_aomyo_roi_pipeline_exposes_submission_controls():
+    source = Path("track4_wholeheart/scripts/predict_mr_aomyo_roi.sh").read_text(encoding="utf-8")
+
+    assert "MR_ROI_PRESET" in source
+    assert "score)" in source
+    assert "safe)" in source
+    assert "AO_ROI_DATASET_ID=\"${AO_ROI_DATASET_ID:-452}\"" in source
+    assert "MYO_ROI_DATASET_ID=\"${MYO_ROI_DATASET_ID:-453}\"" in source
+    assert "--target-label 6" in source
+    assert "--target-label 5" in source
+    assert "--merge-mode add-only" in source
+    assert "--roi-prob-dir" in source
+    assert "--prob-threshold \"${AO_PROB_THRESHOLD}\"" in source
+    assert "--prob-threshold \"${MYO_PROB_THRESHOLD}\"" in source
+    assert "--pred-dir \"${BASE_POSTPROCESSED_DIR}\"" in source
+    assert "--base-pred-dir \"${AO_PASTED_DIR}\"" in source
+    assert "restore_label_values.py" in source
+    assert "check_prediction_sanity.py" in source
+    assert "SKIP_BASE_PREDICT" in source
+
+
 def test_raw_unlabeled_pool_reuses_cached_patches(monkeypatch, tmp_path):
     for idx in range(3):
         (tmp_path / f"case_{idx:03d}_0000.nii.gz").touch()

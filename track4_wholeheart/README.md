@@ -642,6 +642,74 @@ python track4_wholeheart/scripts/check_prediction_sanity.py \
   --label-space official
 ```
 
+## MR AO/Myo ROI Refinement Pipeline
+
+The current MR ROI candidate is an automatic inference-time patch on top of the
+stable MR baseline:
+
+```text
+MR baseline 5-fold nnU-Net
+  -> class-aware-hd postprocess
+  -> AO ROI add-only probability paste
+  -> Myo ROI add-only probability paste
+  -> official label restoration
+  -> optional sanity check
+```
+
+It deliberately does not modify PA. Internal OOF validation showed PA ROI paste
+was negative on fold 0, while AO and Myo had stable positive deltas.
+
+Default one-click submission-style inference:
+
+```bash
+cd /home/data/jingkun/duyanhong/workspace/OTBD
+
+MR_ROI_PRESET=score SANITY_CHECK=1 \
+  bash track4_wholeheart/scripts/predict_mr_aomyo_roi.sh
+```
+
+The two built-in presets are:
+
+| Preset | AO gate | Myo gate | OOF mean DSC delta vs MR baseline | Note |
+| --- | ---: | ---: | ---: | --- |
+| `score` | `p>=0.90`, `d<=3mm` | `p>=0.90`, `d<=2mm` | `+0.000681` | best DSC in 5-fold OOF |
+| `safe` | `p>=0.90`, `d<=2mm` | `p>=0.90`, `d<=2mm` | `+0.000637` | slightly more conservative AO expansion |
+
+Outputs are written under `track4_wholeheart/outputs/${RUN_NAME}`:
+
+```text
+base_raw/                 # raw MR baseline probabilities and labels
+base_class_aware_hd/      # first-stage train-label masks used for ROI crops
+ao_roi/                   # AO crops, metadata, and ROI probabilities
+ao_pasted_train_labels/   # AO-refined train-label masks
+myo_roi/                  # Myo crops, metadata, and ROI probabilities
+train_labels/             # final AO+Myo refined train-label masks
+official_labels/          # restored official challenge labels
+```
+
+Useful overrides:
+
+```bash
+# More conservative hidden-test option
+MR_ROI_PRESET=safe SANITY_CHECK=1 \
+  bash track4_wholeheart/scripts/predict_mr_aomyo_roi.sh
+
+# Reuse an existing class-aware MR baseline instead of rerunning nnU-Net
+SKIP_BASE_PREDICT=1 \
+BASE_POSTPROCESSED_DIR=track4_wholeheart/outputs/mr_val_nnunet_postprocessed \
+RUN_NAME=mr_aomyo_roi_reuse_baseline \
+SANITY_CHECK=1 \
+  bash track4_wholeheart/scripts/predict_mr_aomyo_roi.sh
+
+# Override individual gates if a new validation sweep supports it
+AO_DISTANCE_MM=2 MYO_DISTANCE_MM=2 AO_PROB_THRESHOLD=0.90 MYO_PROB_THRESHOLD=0.90 \
+  bash track4_wholeheart/scripts/predict_mr_aomyo_roi.sh
+```
+
+The script uses training labels internally (`0..7`) and restores official label
+values at the end. It keeps nnU-Net mirror TTA enabled by default and uses full
+`FOLDS="0 1 2 3 4"` unless explicitly overridden.
+
 ## MR MedSAM2 Refinement
 
 Use this only as a development-time refinement between raw MR nnU-Net prediction
