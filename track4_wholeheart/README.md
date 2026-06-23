@@ -544,6 +544,60 @@ bbox/distance neighborhood. The refined train-label output is written to
 `track4_wholeheart/outputs/ct_val_nnunet_postprocessed_aopa_soft/`, then restored
 to `track4_wholeheart/outputs/ct_val_official_labels_postprocessed_aopa_soft/`.
 
+## CT Checkpoint Softmax Ensemble and Bias Search
+
+The current CT rollback baseline remains `checkpoint_final` 5-fold prediction
+plus `legacy` post-processing. To test whether checkpoint-level softmax
+calibration can improve it without changing the model, first generate internal
+OOF softmax files for both final and best checkpoints:
+
+```bash
+cd /home/ssd_14T/jingkun/duyanhong/workspace/OTBD
+source /home/ssd_14T/jingkun/duyanhong/miniconda3/etc/profile.d/conda.sh
+conda activate track4_wholeheart
+
+GPUS="0 1 2 3" FOLDS="0 1 2 3 4" CHECKPOINTS="final best" \
+  bash track4_wholeheart/scripts/run_ct_oof_softmax.sh
+```
+
+The script keeps the exported probabilities separate from nnU-Net's temporary
+`fold_*/validation` directory:
+
+```text
+track4_wholeheart/outputs/internal_val_ct_oof_softmax/
+  final/fold_0/validation/*.npz
+  best/fold_0/validation/*.npz
+```
+
+Then run a fast DSC-first search over final/best weighted softmax and small
+Myo/AO/PA logit-bias sweeps. All candidates are argmaxed and passed through the
+current CT `legacy` post-processing before scoring:
+
+```bash
+DATASET_ROOT="$PWD/track4_wholeheart/DATASET"
+SOFT_ROOT="$PWD/track4_wholeheart/outputs/internal_val_ct_oof_softmax"
+METRIC_ROOT="$PWD/track4_wholeheart/outputs/metrics/ct_softmax_search"
+
+python track4_wholeheart/scripts/search_ct_softmax_ensemble_bias.py \
+  --prob-run final="$SOFT_ROOT/final" \
+  --prob-run best="$SOFT_ROOT/best" \
+  --gt-dir "$DATASET_ROOT/nnUNet_preprocessed/Dataset401_CARE2026_WholeHeart_CT/gt_segmentations" \
+  --bias-mode one-at-a-time \
+  --bias-classes Myo,AO,PA \
+  --bias-values=-0.20,-0.15,-0.10,-0.05,0.05,0.10,0.15,0.20 \
+  --baseline-run final1p00_bnone_legacy \
+  --case-csv "$METRIC_ROOT/case_dsc.csv" \
+  --summary-csv "$METRIC_ROOT/summary_dsc.csv" \
+  --comparison-csv "$METRIC_ROOT/vs_baseline_dsc.csv" \
+  --top-md "$METRIC_ROOT/top_dsc.md"
+```
+
+After identifying the best few DSC candidates, rerun only those candidates with
+`--compute-surface` and explicit `--weight-spec` / `--bias-spec` values so HD95,
+HD, and ASSD are computed for the shortlist. Do not switch away from CT
+`baseline + legacy` unless the OOF comparison is positive class-wise and in
+mean DSC.
+
 Raw nnU-Net predictions:
 
 ```text
