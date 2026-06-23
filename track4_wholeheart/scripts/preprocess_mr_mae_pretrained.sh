@@ -14,6 +14,7 @@ Common environment overrides:
   MAE_PRETRAINING_NAME=ResEncL_OpenMind_MAE
   MAE_ADAPTATION_MODE=default_nnunet|like_pretrained|no_resample|fixed
   MAE_NUM_PROCESSES=4
+  MAE_FORCE_PLAN=1             rerun nnUNet planning even if nnUNetPlans.json exists
 EOF
 }
 
@@ -27,6 +28,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/env_mae.sh"
 DATASET_ID="${DATASET_ID:-402}"
 MAE_ADAPTATION_MODE="${MAE_ADAPTATION_MODE:-default_nnunet}"
 MAE_NUM_PROCESSES="${MAE_NUM_PROCESSES:-4}"
+MAE_FORCE_PLAN="${MAE_FORCE_PLAN:-0}"
 
 if [[ ! -d "${MAE_NNUNET_ROOT}" ]]; then
   echo "ERROR: MAE_NNUNET_ROOT does not exist: ${MAE_NNUNET_ROOT}" >&2
@@ -37,6 +39,8 @@ if [[ ! -f "${MAE_CHECKPOINT}" ]]; then
   exit 1
 fi
 
+DATASET_DIR="$(find "${nnUNet_preprocessed}" -maxdepth 1 -type d -name "Dataset${DATASET_ID}_*" | head -n 1)"
+
 cat <<EOF
 MR MAE preprocessing
 dataset_id=${DATASET_ID}
@@ -45,11 +49,17 @@ checkpoint=${MAE_CHECKPOINT}
 pretraining_name=${MAE_PRETRAINING_NAME}
 adaptation_mode=${MAE_ADAPTATION_MODE}
 num_processes=${MAE_NUM_PROCESSES}
+force_plan=${MAE_FORCE_PLAN}
 nnUNet_preprocessed=${nnUNet_preprocessed}
 nnUNet_results=${nnUNet_results}
 EOF
 
-nnUNetv2_plan_and_preprocess -d "${DATASET_ID}" --no_pp
+if [[ "${MAE_FORCE_PLAN}" == "1" || -z "${DATASET_DIR}" || ! -f "${DATASET_DIR}/nnUNetPlans.json" ]]; then
+  nnUNetv2_plan_and_preprocess -d "${DATASET_ID}" --no_pp
+  DATASET_DIR="$(find "${nnUNet_preprocessed}" -maxdepth 1 -type d -name "Dataset${DATASET_ID}_*" | head -n 1)"
+else
+  echo "Found existing nnUNet plans, skipping planning: ${DATASET_DIR}/nnUNetPlans.json"
+fi
 
 nnUNetv2_preprocess_like_nnssl \
   -d "${DATASET_ID}" \
@@ -60,5 +70,4 @@ nnUNetv2_preprocess_like_nnssl \
   --verbose
 
 echo "Available MAE plans:"
-DATASET_DIR="$(find "${nnUNet_preprocessed}" -maxdepth 1 -type d -name "Dataset${DATASET_ID}_*" | head -n 1)"
 find "${DATASET_DIR}" -maxdepth 1 -type f -name "ptPlans__${MAE_PRETRAINING_NAME}*.json" -printf "%f\n" | sort
