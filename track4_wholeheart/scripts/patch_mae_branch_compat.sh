@@ -10,9 +10,9 @@ if [[ ! -f "${TARGET}" ]]; then
   exit 1
 fi
 
-if grep -q 'for c in cit\["apa_citations"\]:' "${TARGET}"; then
+if grep -Fq 'for c in cit["apa_citations"]:' "${TARGET}"; then
   cp -n "${TARGET}" "${TARGET}.orig"
-  perl -0pi -e 's/for c in cit\\["apa_citations"\\]:/for c in cit.get("apa_citations", cit.get("bibtex_citations", [])):/g' "${TARGET}"
+  perl -0pi -e 's/for c in cit\["apa_citations"\]:/for c in cit.get("apa_citations", cit.get("bibtex_citations", [])):/g' "${TARGET}"
   echo "Patched MAE PretrainedTrainer citation compatibility: ${TARGET}"
 else
   echo "MAE PretrainedTrainer citation compatibility already patched or upstream changed: ${TARGET}"
