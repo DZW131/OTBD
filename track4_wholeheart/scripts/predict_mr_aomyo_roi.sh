@@ -15,7 +15,7 @@ Submission-oriented MR inference pipeline:
     -> optional sanity check
 
 Common environment overrides:
-  MR_ROI_PRESET=score|safe       score: AO d3 + Myo d2, safe: AO d2 + Myo d2
+  MR_ROI_PRESET=tuned|score|safe tuned: AO p0.85 d4 + Myo p0.85 d3, score: AO d3 + Myo d2, safe: AO d2 + Myo d2
   RUN_NAME=<name>                output folder under track4_wholeheart/outputs
   FOLDS="0 1 2 3 4"             baseline and ROI ensemble folds
   BASE_TRAINER=nnUNetTrainer     first-stage MR trainer
@@ -61,21 +61,29 @@ AO_PASTED_DIR="${AO_PASTED_DIR:-${OUTPUT_ROOT}/ao_pasted_train_labels}"
 FINAL_TRAIN_LABEL_DIR="${FINAL_TRAIN_LABEL_DIR:-${OUTPUT_ROOT}/train_labels}"
 OFFICIAL_DIR="${OFFICIAL_DIR:-${OUTPUT_ROOT}/official_labels}"
 
-AO_PROB_THRESHOLD="${AO_PROB_THRESHOLD:-0.90}"
-MYO_PROB_THRESHOLD="${MYO_PROB_THRESHOLD:-0.90}"
 MYO_DISTANCE_MM="${MYO_DISTANCE_MM:-2}"
 ROI_MARGIN_MM="${ROI_MARGIN_MM:-20}"
 ROI_MIN_MARGIN_VOXELS="${ROI_MIN_MARGIN_VOXELS:-8}"
 
 case "${MR_ROI_PRESET}" in
+  tuned)
+    AO_PROB_THRESHOLD="${AO_PROB_THRESHOLD:-0.85}"
+    AO_DISTANCE_MM="${AO_DISTANCE_MM:-4}"
+    MYO_PROB_THRESHOLD="${MYO_PROB_THRESHOLD:-0.85}"
+    MYO_DISTANCE_MM="${MYO_DISTANCE_MM:-3}"
+    ;;
   score)
+    AO_PROB_THRESHOLD="${AO_PROB_THRESHOLD:-0.90}"
     AO_DISTANCE_MM="${AO_DISTANCE_MM:-3}"
+    MYO_PROB_THRESHOLD="${MYO_PROB_THRESHOLD:-0.90}"
     ;;
   safe)
+    AO_PROB_THRESHOLD="${AO_PROB_THRESHOLD:-0.90}"
     AO_DISTANCE_MM="${AO_DISTANCE_MM:-2}"
+    MYO_PROB_THRESHOLD="${MYO_PROB_THRESHOLD:-0.90}"
     ;;
   *)
-    echo "ERROR: MR_ROI_PRESET must be score or safe, got ${MR_ROI_PRESET}" >&2
+    echo "ERROR: MR_ROI_PRESET must be tuned, score, or safe, got ${MR_ROI_PRESET}" >&2
     exit 1
     ;;
 esac

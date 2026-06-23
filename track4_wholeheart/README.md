@@ -713,20 +713,22 @@ MR baseline 5-fold nnU-Net
 It deliberately does not modify PA. Internal OOF validation showed PA ROI paste
 was negative on fold 0, while AO and Myo had stable positive deltas.
 
-Default one-click submission-style inference:
+Current threshold-search candidate:
 
 ```bash
 cd /home/data/jingkun/duyanhong/workspace/OTBD
 
-MR_ROI_PRESET=score SANITY_CHECK=1 \
+MR_ROI_PRESET=tuned SANITY_CHECK=1 \
   bash track4_wholeheart/scripts/predict_mr_aomyo_roi.sh
 ```
 
-The two built-in presets are:
+For backward compatibility, the script default remains `MR_ROI_PRESET=score`.
+The built-in presets are:
 
 | Preset | AO gate | Myo gate | OOF mean DSC delta vs MR baseline | Note |
 | --- | ---: | ---: | ---: | --- |
-| `score` | `p>=0.90`, `d<=3mm` | `p>=0.90`, `d<=2mm` | `+0.000681` | best DSC in 5-fold OOF |
+| `tuned` | `p>=0.85`, `d<=4mm` | `p>=0.85`, `d<=3mm` | `+0.000723` | best DSC in the 2026-06-23 5-fold OOF threshold sweep |
+| `score` | `p>=0.90`, `d<=3mm` | `p>=0.90`, `d<=2mm` | `+0.000681` | previous best DSC candidate |
 | `safe` | `p>=0.90`, `d<=2mm` | `p>=0.90`, `d<=2mm` | `+0.000637` | slightly more conservative AO expansion |
 
 Outputs are written under `track4_wholeheart/outputs/${RUN_NAME}`:
@@ -744,6 +746,10 @@ official_labels/          # restored official challenge labels
 Useful overrides:
 
 ```bash
+# Current threshold-search winner
+MR_ROI_PRESET=tuned SANITY_CHECK=1 \
+  bash track4_wholeheart/scripts/predict_mr_aomyo_roi.sh
+
 # More conservative hidden-test option
 MR_ROI_PRESET=safe SANITY_CHECK=1 \
   bash track4_wholeheart/scripts/predict_mr_aomyo_roi.sh
