@@ -14,6 +14,7 @@ Common environment overrides:
   GPU=0
   MAE_PLANS_NAME=<ptPlans__... name without .json>
   MAE_TRAINER=PretrainedTrainer
+  MAE_PATCH_COMPAT=1
   CONTINUE=1
   SAVE_NPZ=1
 EOF
@@ -31,6 +32,7 @@ CONFIGURATION="${CONFIGURATION:-3d_fullres}"
 FOLD="${FOLD:-0}"
 GPU="${GPU:-0}"
 MAE_TRAINER="${MAE_TRAINER:-PretrainedTrainer}"
+MAE_PATCH_COMPAT="${MAE_PATCH_COMPAT:-1}"
 SAVE_NPZ="${SAVE_NPZ:-1}"
 CONTINUE="${CONTINUE:-0}"
 
@@ -69,6 +71,10 @@ nnUNet_results=${nnUNet_results}
 continue=${CONTINUE}
 save_npz=${SAVE_NPZ}
 EOF
+
+if [[ "${MAE_PATCH_COMPAT}" == "1" ]]; then
+  bash "$(dirname "${BASH_SOURCE[0]}")/patch_mae_branch_compat.sh"
+fi
 
 CUDA_VISIBLE_DEVICES="${GPU}" nnUNetv2_train_pretrained \
   "${DATASET_ID}" \

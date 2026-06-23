@@ -798,6 +798,10 @@ Launch a fold:
 GPU=0 FOLD=0 bash track4_wholeheart/scripts/train_mr_mae_pretrained.sh
 ```
 
+The train wrapper applies a small compatibility patch for TaWald
+`PretrainedTrainer` citation printing when the checkpoint stores
+`bibtex_citations` instead of `apa_citations`.
+
 Useful overrides:
 
 ```bash
