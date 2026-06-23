@@ -770,6 +770,45 @@ The script uses training labels internally (`0..7`) and restores official label
 values at the end. It keeps nnU-Net mirror TTA enabled by default and uses full
 `FOLDS="0 1 2 3 4"` unless explicitly overridden.
 
+## MR MAE-Pretrained ResEnc Fine-Tuning
+
+This is an isolated experimental branch for testing the TaWald/nnU-Net
+`nnssl_finetuning_inclusion` workflow with the ResEncL OpenMind MAE checkpoint.
+It writes to `nnUNet_result_mae`, so it does not overwrite the stable MR
+baseline or ROI checkpoints.
+
+Expected one-time server layout:
+
+```text
+third_party/TaWald_nnUNet_nnssl/
+pretrained/MAE/ResEncL-OpenMind-MAE/checkpoint_final.pth
+```
+
+Prepare the MAE preprocessing:
+
+```bash
+cd /home/data/jingkun/duyanhong/workspace/OTBD
+
+bash track4_wholeheart/scripts/preprocess_mr_mae_pretrained.sh
+```
+
+Launch a fold:
+
+```bash
+GPU=0 FOLD=0 bash track4_wholeheart/scripts/train_mr_mae_pretrained.sh
+```
+
+Useful overrides:
+
+```bash
+# Resume an interrupted fold
+CONTINUE=1 GPU=0 FOLD=0 bash track4_wholeheart/scripts/train_mr_mae_pretrained.sh
+
+# Try the more aggressive spacing adaptation recommended by the MAE branch docs
+MAE_ADAPTATION_MODE=like_pretrained \
+  bash track4_wholeheart/scripts/preprocess_mr_mae_pretrained.sh
+```
+
 ## MR MedSAM2 Refinement
 
 Use this only as a development-time refinement between raw MR nnU-Net prediction
