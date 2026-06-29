@@ -326,6 +326,101 @@ def patch_predictor_with_grata(predictor, adapter: GraTaLiteAdapter) -> None:
     )
 
 
+def initialize_predictor_from_trained_model_folder_compat(
+    predictor,
+    model_dir: Path,
+    folds: Sequence[int | str],
+    checkpoint_name: str,
+) -> None:
+    try:
+        predictor.initialize_from_trained_model_folder(
+            str(model_dir),
+            list(folds),
+            checkpoint_name=checkpoint_name,
+        )
+        return
+    except TypeError as exc:
+        message = str(exc)
+        if "build_network_architecture" not in message or "num_output_channels" not in message:
+            raise
+
+    print(
+        "Standard predictor initialization failed because the trainer build_network_architecture "
+        "signature differs; retrying with MAE/nnSSL-compatible initialization.",
+        flush=True,
+    )
+
+    import nnunetv2
+    from batchgenerators.utilities.file_and_folder_operations import join, load_json
+    from nnunetv2.utilities.find_class_by_name import recursive_find_python_class
+    from nnunetv2.utilities.label_handling.label_handling import determine_num_input_channels
+    from nnunetv2.utilities.plans_handling.plans_handler import PlansManager
+
+    dataset_json = load_json(join(str(model_dir), "dataset.json"))
+    plans = load_json(join(str(model_dir), "plans.json"))
+    plans_manager = PlansManager(plans)
+
+    parameters = []
+    trainer_name = None
+    configuration_name = None
+    inference_allowed_mirroring_axes = None
+    for i, fold in enumerate(folds):
+        checkpoint = torch.load(
+            join(str(model_dir), f"fold_{fold}", checkpoint_name),
+            map_location=torch.device("cpu"),
+            weights_only=False,
+        )
+        if i == 0:
+            trainer_name = checkpoint["trainer_name"]
+            configuration_name = checkpoint["init_args"]["configuration"]
+            inference_allowed_mirroring_axes = checkpoint.get("inference_allowed_mirroring_axes")
+        parameters.append(checkpoint["network_weights"])
+
+    if trainer_name is None or configuration_name is None:
+        raise RuntimeError(f"No checkpoints loaded from {model_dir} folds={folds}")
+
+    configuration_manager = plans_manager.get_configuration(configuration_name)
+    label_manager = plans_manager.get_label_manager(dataset_json)
+    num_input_channels = determine_num_input_channels(plans_manager, configuration_manager, dataset_json)
+    trainer_class = recursive_find_python_class(
+        join(nnunetv2.__path__[0], "training", "nnUNetTrainer"),
+        trainer_name,
+        "nnunetv2.training.nnUNetTrainer",
+    )
+    if trainer_class is None:
+        raise RuntimeError(f"Unable to locate trainer class {trainer_name}")
+
+    try:
+        network = trainer_class.build_network_architecture(
+            configuration_manager.network_arch_class_name,
+            configuration_manager.network_arch_init_kwargs,
+            configuration_manager.network_arch_init_kwargs_req_import,
+            configuration_manager.patch_size,
+            num_input_channels,
+            label_manager.num_segmentation_heads,
+            enable_deep_supervision=False,
+        )
+    except TypeError:
+        network = trainer_class.build_network_architecture(
+            configuration_manager.network_arch_class_name,
+            configuration_manager.network_arch_init_kwargs,
+            configuration_manager.network_arch_init_kwargs_req_import,
+            num_input_channels,
+            label_manager.num_segmentation_heads,
+            enable_deep_supervision=False,
+        )
+    network.load_state_dict(parameters[0])
+    predictor.manual_initialization(
+        network=network,
+        plans_manager=plans_manager,
+        configuration_manager=configuration_manager,
+        parameters=parameters,
+        dataset_json=dataset_json,
+        trainer_name=trainer_name,
+        inference_allowed_mirroring_axes=inference_allowed_mirroring_axes,
+    )
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Conservative GraTa-style single-case TTA wrapper for nnU-Net validation experiments."
@@ -401,11 +496,7 @@ def main() -> None:
         verbose_preprocessing=False,
         allow_tqdm=True,
     )
-    predictor.initialize_from_trained_model_folder(
-        str(args.model_dir),
-        folds,
-        checkpoint_name=args.checkpoint,
-    )
+    initialize_predictor_from_trained_model_folder_compat(predictor, args.model_dir, folds, args.checkpoint)
     patch_predictor_with_grata(predictor, GraTaLiteAdapter(args))
     predictor.predict_from_files(
         inputs,
