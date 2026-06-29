@@ -770,6 +770,70 @@ The script uses training labels internally (`0..7`) and restores official label
 values at the end. It keeps nnU-Net mirror TTA enabled by default and uses full
 `FOLDS="0 1 2 3 4"` unless explicitly overridden.
 
+## MR Final ROI + MAE + GraTa-lite Pipeline
+
+The current MR final candidate keeps the tuned AO/Myo ROI output as the base,
+then uses the MAE ResEncL model with conservative GraTa-lite TTA as a donor for
+only the classes that improved in OOF:
+
+```text
+tuned AO/Myo ROI train-label prediction
+  + MAE ResEncL prediction with GraTa-lite
+  -> add-only import LV/RV/Myo/PA from MAE
+  -> protect LA/RA/AO from overwrite
+  -> class-aware-hd postprocess
+  -> official label restoration
+  -> optional sanity check
+```
+
+Five-fold OOF result on 2026-06-29:
+
+| Run | Mean DSC | vs baseline | vs tuned ROI | vs tuned+MAE |
+| --- | ---: | ---: | ---: | ---: |
+| tuned ROI + MAE + GraTa-lite | `0.886382` | `+0.002085` | `+0.001362` | `+0.000012` |
+| tuned ROI + MAE | `0.886370` | `+0.002074` | `+0.001350` | `0.000000` |
+| tuned ROI | `0.885020` | `+0.000723` | `0.000000` | `-0.001350` |
+| MR baseline | `0.884296` | `0.000000` | `-0.000723` | `-0.002074` |
+
+The GraTa-lite gain is tiny but conservative: AO/LA/RA are locked, PA improved
+slightly, and center-level OOF was non-negative for both MR C/D and MR E.
+
+Submission-oriented command:
+
+```bash
+cd /home/data/jingkun/duyanhong/workspace/OTBD
+
+SANITY_CHECK=1 \
+  bash track4_wholeheart/scripts/predict_mr_final_roi_mae_grata.sh
+```
+
+Useful recovery/reuse modes:
+
+```bash
+# Reuse an already generated tuned ROI train-label directory.
+SKIP_TUNED_ROI=1 \
+BASE_TRAIN_LABEL_DIR=track4_wholeheart/outputs/mr_aomyo_roi_tuned/train_labels \
+SANITY_CHECK=1 \
+  bash track4_wholeheart/scripts/predict_mr_final_roi_mae_grata.sh
+
+# Reuse an already generated MAE+GraTa class-aware donor directory.
+SKIP_MAE_GRATA=1 \
+MAE_GRATA_POST_DIR=track4_wholeheart/outputs/mr_mae_grata/mae_grata_classaware \
+SANITY_CHECK=1 \
+  bash track4_wholeheart/scripts/predict_mr_final_roi_mae_grata.sh
+
+# Reproduce the non-GraTa tuned ROI + MAE variant.
+SKIP_MAE_GRATA=1 \
+MAE_GRATA_POST_DIR=track4_wholeheart/outputs/internal_val_mr_mae_final_5fold_compare/mae_final_postprocessed \
+SANITY_CHECK=1 \
+  bash track4_wholeheart/scripts/predict_mr_final_roi_mae_grata.sh
+```
+
+GraTa-lite defaults are intentionally mild: `GRATA_STEPS=1`,
+`GRATA_LR=1e-5`, `GRATA_PARAM_SCOPE=norm-affine`, and nnU-Net mirror TTA stays
+enabled. The final official-label masks are written to
+`track4_wholeheart/outputs/${RUN_NAME}/official_labels`.
+
 ## MR MAE-Pretrained ResEnc Fine-Tuning
 
 This is an isolated experimental branch for testing the TaWald/nnU-Net
